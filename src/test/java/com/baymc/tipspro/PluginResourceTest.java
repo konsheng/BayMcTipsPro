@@ -31,6 +31,8 @@ final class PluginResourceTest {
         String configYml = Files.readString(Path.of("src/main/resources/config.yml"));
 
         assertTrue(configYml.contains("announcements:"));
+        assertTrue(configYml.contains("language:"));
+        assertTrue(configYml.contains("file: \"zh_CN.yml\""));
         assertTrue(configYml.contains("interval-seconds: 300"));
         assertTrue(configYml.contains("send-to-console: true"));
         assertFalse(configYml.contains("messages:"));

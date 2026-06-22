@@ -23,6 +23,9 @@ import org.bukkit.plugin.java.JavaPlugin;
  * GUI, 标题, 动作栏和 BossBar 都不属于这个插件的职责范围
  */
 public final class BayMcTipsProPlugin extends JavaPlugin {
+    private static final String DEFAULT_LANGUAGE_FILE = "zh_CN.yml";
+    private static final String LANGUAGE_DIRECTORY = "lang";
+
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
 
     private SchedulerAdapter schedulerAdapter;
@@ -178,17 +181,41 @@ public final class BayMcTipsProPlugin extends JavaPlugin {
     }
 
     private void saveDefaultLanguageConfig() {
-        File languageFile = languageFile();
-        if (!languageFile.exists()) {
-            saveResource("lang/zh_CN.yml", false);
+        File defaultLanguageFile = new File(languageDirectory(), DEFAULT_LANGUAGE_FILE);
+        if (!defaultLanguageFile.exists()) {
+            saveResource(LANGUAGE_DIRECTORY + "/" + DEFAULT_LANGUAGE_FILE, false);
         }
     }
 
     private File languageFile() {
-        return new File(getDataFolder(), "lang/zh_CN.yml");
+        File selectedFile = new File(languageDirectory(), configuredLanguageFile());
+        if (selectedFile.isFile()) {
+            return selectedFile;
+        }
+        return new File(languageDirectory(), DEFAULT_LANGUAGE_FILE);
     }
 
     private File tipsFile() {
         return new File(getDataFolder(), "tips.yml");
+    }
+
+    private File languageDirectory() {
+        return new File(getDataFolder(), LANGUAGE_DIRECTORY);
+    }
+
+    private String configuredLanguageFile() {
+        String configured = getConfig().getString("language.file", DEFAULT_LANGUAGE_FILE);
+        if (configured == null) {
+            return DEFAULT_LANGUAGE_FILE;
+        }
+        String fileName = configured.trim();
+        if (fileName.isBlank()
+            || fileName.contains("/")
+            || fileName.contains("\\")
+            || fileName.contains("..")
+            || !fileName.endsWith(".yml")) {
+            return DEFAULT_LANGUAGE_FILE;
+        }
+        return fileName;
     }
 }

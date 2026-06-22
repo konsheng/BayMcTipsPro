@@ -5,7 +5,7 @@ import java.util.List;
 import org.bukkit.configuration.file.FileConfiguration;
 
 /**
- * 从 {@code lang/zh_CN.yml} 读取 MiniMessage 运行时文本
+ * 从配置选择的语言文件读取 MiniMessage 运行时文本
  *
  * <p>命令反馈, 状态标签, 校验提示和控制台日志都会经过这个目录读取, 让可见文案可以在不修改
  * Java 源码的情况下调整
@@ -16,7 +16,7 @@ public final class LanguageCatalog {
     /**
      * 创建基于 Bukkit YAML 配置的语言文本目录
      *
-     * @param config 已加载的 {@code lang/zh_CN.yml} 配置
+     * @param config 已加载的语言文件配置
      */
     public LanguageCatalog(FileConfiguration config) {
         this.config = config;

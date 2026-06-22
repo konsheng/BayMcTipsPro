@@ -13,7 +13,7 @@ BayMcTipsPro 是一个面向 Paper 和 Folia 的轻量级聊天栏公告插件, 
 - 支持 `/tips next` 手动立即发送一条随机公告
 - 支持 `/tips status` 查看公告功能, 任务状态, 有效公告数量和调度模式
 - 支持 `/tips reload` 重载配置和语言文件
-- 支持 `lang/zh_CN.yml` 管理命令反馈, 日志和校验提示
+- 支持通过配置选择语言文件, 管理命令反馈, 日志和校验提示
 - 支持将已发送公告的纯文本内容同步输出到控制台
 - 支持启动和重载时校验公告文本, 无效 MiniMessage 公告会被跳过并输出日志
 
@@ -41,9 +41,9 @@ BayMcTipsPro 是一个面向 Paper 和 Folia 的轻量级聊天栏公告插件, 
 1. 下载或构建 `BayMcTipsPro-*.jar`
 2. 将 jar 文件放入服务器 `plugins` 目录
 3. 启动一次服务器, 生成 `plugins/BayMcTipsPro/config.yml`, `plugins/BayMcTipsPro/tips.yml` 和 `plugins/BayMcTipsPro/lang/zh_CN.yml`
-4. 编辑 `config.yml` 中的公告开关, 间隔和控制台输出
+4. 编辑 `config.yml` 中的语言文件, 公告开关, 间隔和控制台输出
 5. 编辑 `tips.yml` 中的公告内容
-6. 按需编辑 `lang/zh_CN.yml` 中的命令反馈和日志文本
+6. 按需编辑 `language.file` 指向的语言文件中的命令反馈和日志文本
 7. 执行 `/tips reload` 重载插件, 或重启服务器
 8. 给需要使用命令的玩家或权限组分配 `baymctipspro.command`
 
@@ -83,6 +83,9 @@ BayMcTipsPro 是一个面向 Paper 和 Folia 的轻量级聊天栏公告插件, 
 默认配置文件为 `plugins/BayMcTipsPro/config.yml`
 
 ```yaml
+language:
+  file: "zh_CN.yml"
+
 announcements:
   enabled: true
   interval-seconds: 300
@@ -94,6 +97,7 @@ announcements:
 
 | 配置项 | 默认值 | 说明 |
 | --- | --- | --- |
+| `language.file` | `zh_CN.yml` | 使用的语言文件, 对应 `lang` 目录下的 yml 文件 |
 | `announcements.enabled` | `true` | 是否启用自动定时公告 |
 | `announcements.interval-seconds` | `300` | 自动公告间隔秒数, 小于 `5` 会自动提升到 `5` |
 | `announcements.initial-delay-seconds` | `30` | 启动或重载后的首次公告延迟秒数, 小于 `1` 会自动提升到 `1` |
@@ -118,6 +122,8 @@ tips:
 ## 语言文件
 
 默认语言文件为 `plugins/BayMcTipsPro/lang/zh_CN.yml`
+
+可在 `config.yml` 中通过 `language.file` 选择其他语言文件, 文件必须放在 `plugins/BayMcTipsPro/lang/` 目录下
 
 语言文件包含:
 - 命令反馈

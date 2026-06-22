@@ -1,4 +1,8 @@
 # 调度配置不包含公告内容, 公告列表请写入 tips.yml
+language:
+  # 使用的语言文件, 对应 lang 目录下的 yml 文件
+  file: "zh_CN.yml"
+
 announcements:
   # 是否启用自动公告定时任务, 关闭后仍可使用 /tips next 手动发送随机公告
   enabled: true
