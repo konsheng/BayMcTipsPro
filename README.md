@@ -4,7 +4,7 @@ BayMcTipsPro 是一个面向 Paper 和 Folia 的轻量级聊天栏公告插件, 
 
 插件不提供 GUI, ActionBar, Title, BossBar, Sound 或跨服广播能力, 适合只需要简单聊天栏公告的小型服务器和登录服
 
-## 功能特性
+## ✨ 功能特性
 
 - 支持 Paper 和 Folia, Folia 环境使用全局调度器执行定时任务
 - 支持 MiniMessage 公告文本, 可使用颜色, 悬停, 点击, URL 和命令事件
@@ -17,7 +17,7 @@ BayMcTipsPro 是一个面向 Paper 和 Folia 的轻量级聊天栏公告插件, 
 - 支持将已发送公告的纯文本内容同步输出到控制台
 - 支持启动和重载时校验公告文本, 无效 MiniMessage 公告会被跳过并输出日志
 
-## 运行环境
+## 🧩 运行环境
 
 | 项目 | 要求 |
 | --- | --- |
@@ -26,7 +26,7 @@ BayMcTipsPro 是一个面向 Paper 和 Folia 的轻量级聊天栏公告插件, 
 | Paper API | 26.1.2 |
 | 构建工具 | Gradle Wrapper |
 
-## 服务端支持
+## 🖥️ 服务端支持
 
 | 服务端 | 支持状态 |
 | --- | --- |
@@ -36,7 +36,7 @@ BayMcTipsPro 是一个面向 Paper 和 Folia 的轻量级聊天栏公告插件, 
 | CraftBukkit | 不支持 |
 | 其他 Paper 分支 | 未完整验证 |
 
-## 安装
+## 📦 安装
 
 1. 下载或构建 `BayMcTipsPro-*.jar`
 2. 将 jar 文件放入服务器 `plugins` 目录
@@ -47,7 +47,7 @@ BayMcTipsPro 是一个面向 Paper 和 Folia 的轻量级聊天栏公告插件, 
 7. 执行 `/tips reload` 重载插件, 或重启服务器
 8. 给需要使用命令的玩家或权限组分配对应子命令权限
 
-## 命令
+## 🧭 命令
 
 主命令:
 - `/baymctipspro`
@@ -70,7 +70,7 @@ BayMcTipsPro 是一个面向 Paper 和 Folia 的轻量级聊天栏公告插件, 
 
 玩家执行命令需要对应子命令权限, 控制台可直接执行命令
 
-## 权限
+## 🔐 权限
 
 | 权限 | 默认 | 说明 |
 | --- | --- | --- |
@@ -80,7 +80,7 @@ BayMcTipsPro 是一个面向 Paper 和 Folia 的轻量级聊天栏公告插件, 
 | `baymctipspro.status` | OP | 允许查看公告运行状态 |
 | `baymctipspro.reload` | OP | 允许重载配置和语言文件 |
 
-## 配置
+## ⚙️ 配置
 
 默认配置文件为 `plugins/BayMcTipsPro/config.yml`
 
@@ -107,7 +107,7 @@ announcements:
 
 `announcements.enabled` 只控制自动定时任务, 即使关闭自动公告, 只要存在有效公告, 仍可使用 `/tips next` 手动发送
 
-## MiniMessage
+## 💬 MiniMessage
 
 公告文本只支持 MiniMessage, 不解析 `&a` 这类旧式颜色代码
 
@@ -121,7 +121,7 @@ tips:
   - "<yellow>[官网]</yellow> <hover:show_text:'点击打开官网'><click:open_url:'https://example.com'><underlined>点击访问</underlined></click></hover>"
 ```
 
-## 语言文件
+## 🌐 语言文件
 
 默认语言文件为 `plugins/BayMcTipsPro/lang/zh_CN.yml`
 
@@ -138,7 +138,7 @@ tips:
 
 修改语言文件后执行 `/tips reload` 即可生效
 
-## 构建
+## 🛠️ 构建
 
 Windows:
 
@@ -164,6 +164,6 @@ build/libs/BayMcTipsPro-1.0.0-SNAPSHOT.jar
 build/libs/BayMcTipsPro-1.0.0-SNAPSHOT-<short-sha>.jar
 ```
 
-## 许可证
+## 📄 许可证
 
 本项目使用 GNU General Public License version 3, 详情见 [LICENSE](LICENSE)
