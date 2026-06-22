@@ -1,0 +1,21 @@
+# BayMcTipsPro only supports MiniMessage. Legacy color codes such as &a are not parsed.
+announcements:
+  # Enables the automatic scheduled announcement task. The /tips next command can still send
+  # a random announcement manually when this is disabled, as long as valid messages exist.
+  enabled: true
+
+  # Seconds between automatic announcements. Values lower than 5 are raised to 5.
+  interval-seconds: 300
+
+  # Seconds before the first automatic announcement after startup or reload.
+  # Values lower than 1 are raised to 1.
+  initial-delay-seconds: 30
+
+  # Logs the plain-text form of every sent announcement to the console.
+  send-to-console: true
+
+  # Every entry is parsed as MiniMessage and may use click, hover, URL, and command events.
+  messages:
+    - "<gold>[公告]</gold> 欢迎来到 <aqua>BayMC</aqua>"
+    - "<green>[主城]</green> <hover:show_text:'点击执行 /spawn'><click:run_command:'/spawn'>点击返回主城</click></hover>"
+    - "<yellow>[官网]</yellow> <hover:show_text:'点击打开官网'><click:open_url:'https://example.com'><underlined>点击访问</underlined></click></hover>"
