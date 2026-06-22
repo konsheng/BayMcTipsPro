@@ -7,7 +7,7 @@ package com.baymc.tipspro.config;
  * 重载流程仍然安全, 失败原因保存为语言键, 具体提示文本仍由 {@code lang/zh_CN.yml} 提供
  *
  * @param index 配置列表中的一基序号
- * @param rawMessage 来自 {@code config.yml} 的原始文本
+ * @param rawMessage 来自 {@code tips.yml} 的原始文本
  * @param reasonKey 拒绝该条目的原因语言键
  * @param detail 用于诊断的可选解析细节
  */

@@ -34,6 +34,7 @@ public final class BayMcTipsProPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        saveDefaultTipsConfig();
         saveDefaultLanguageConfig();
         reloadLanguage();
         schedulerAdapter = new SchedulerAdapter(this, this::language);
@@ -59,14 +60,15 @@ public final class BayMcTipsProPlugin extends JavaPlugin {
     }
 
     /**
-     * 重新加载 {@code config.yml} 与语言文件, 校验公告并重启自动公告任务
+     * 重新加载 {@code config.yml}, {@code tips.yml} 与语言文件, 校验公告并重启自动公告任务
      *
      * @return 重载后的有效运行配置
      */
     public PluginConfig reloadAnnouncements() {
         reloadConfig();
         reloadLanguage();
-        currentConfig = PluginConfig.load(getConfig(), miniMessage);
+        currentConfig =
+            PluginConfig.load(getConfig(), loadTipsConfiguration(), miniMessage);
         announcementService.applyRuntime(currentConfig, language);
         announcementScheduler.restart(currentConfig);
         logConfigState(currentConfig);
@@ -164,6 +166,17 @@ public final class BayMcTipsProPlugin extends JavaPlugin {
         language = new LanguageCatalog(YamlConfiguration.loadConfiguration(languageFile()));
     }
 
+    private YamlConfiguration loadTipsConfiguration() {
+        return YamlConfiguration.loadConfiguration(tipsFile());
+    }
+
+    private void saveDefaultTipsConfig() {
+        File tipsFile = tipsFile();
+        if (!tipsFile.exists()) {
+            saveResource("tips.yml", false);
+        }
+    }
+
     private void saveDefaultLanguageConfig() {
         File languageFile = languageFile();
         if (!languageFile.exists()) {
@@ -173,5 +186,9 @@ public final class BayMcTipsProPlugin extends JavaPlugin {
 
     private File languageFile() {
         return new File(getDataFolder(), "lang/zh_CN.yml");
+    }
+
+    private File tipsFile() {
+        return new File(getDataFolder(), "tips.yml");
     }
 }

@@ -1,4 +1,4 @@
-# BayMcTipsPro 只支持 MiniMessage, 不解析 &a 这类旧式颜色代码
+# 调度配置不包含公告内容, 公告列表请写入 tips.yml
 announcements:
   # 是否启用自动公告定时任务, 关闭后仍可使用 /tips next 手动发送随机公告
   enabled: true
@@ -12,9 +12,3 @@ announcements:
 
   # 是否将每次发送公告的纯文本内容写入控制台
   send-to-console: true
-
-  # 每条公告都会按 MiniMessage 解析, 可使用点击, 悬停, URL 和命令事件
-  messages:
-    - "<gold>[公告]</gold> 欢迎来到 <aqua>BayMC</aqua>"
-    - "<green>[主城]</green> <hover:show_text:'点击执行 /spawn'><click:run_command:'/spawn'>点击返回主城</click></hover>"
-    - "<yellow>[官网]</yellow> <hover:show_text:'点击打开官网'><click:open_url:'https://example.com'><underlined>点击访问</underlined></click></hover>"

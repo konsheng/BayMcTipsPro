@@ -13,8 +13,8 @@ import org.bukkit.plugin.Plugin;
 /**
  * 保存已校验的公告内容, 并负责随机发送公告
  *
- * <p>这个服务不会直接读取 {@code config.yml}, 重载时会替换不可变配置快照, 定时发送和手动发送
- * 共用同一套随机选择与广播路径
+ * <p>这个服务不会直接读取 {@code config.yml} 或 {@code tips.yml}, 重载时会替换不可变配置快照
+ * 定时发送和手动发送共用同一套随机选择与广播路径
  */
 public final class AnnouncementService {
     private final Plugin plugin;

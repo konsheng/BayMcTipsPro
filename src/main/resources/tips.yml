@@ -1,0 +1,6 @@
+# BayMcTipsPro 只支持 MiniMessage, 不解析 &a 这类旧式颜色代码
+# 每条公告都会按 MiniMessage 解析, 可使用点击, 悬停, URL 和命令事件
+tips:
+  - "<gold>[公告]</gold> 欢迎来到 <aqua>BayMC</aqua>"
+  - "<green>[主城]</green> <hover:show_text:'点击执行 /spawn'><click:run_command:'/spawn'>点击返回主城</click></hover>"
+  - "<yellow>[官网]</yellow> <hover:show_text:'点击打开官网'><click:open_url:'https://example.com'><underlined>点击访问</underlined></click></hover>"

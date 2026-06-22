@@ -40,11 +40,12 @@ BayMcTipsPro 是一个面向 Paper 和 Folia 的轻量级聊天栏公告插件, 
 
 1. 下载或构建 `BayMcTipsPro-*.jar`
 2. 将 jar 文件放入服务器 `plugins` 目录
-3. 启动一次服务器, 生成 `plugins/BayMcTipsPro/config.yml` 和 `plugins/BayMcTipsPro/lang/zh_CN.yml`
-4. 编辑 `config.yml` 中的公告开关, 间隔和公告内容
-5. 按需编辑 `lang/zh_CN.yml` 中的命令反馈和日志文本
-6. 执行 `/tips reload` 重载插件, 或重启服务器
-7. 给需要使用命令的玩家或权限组分配 `baymctipspro.command`
+3. 启动一次服务器, 生成 `plugins/BayMcTipsPro/config.yml`, `plugins/BayMcTipsPro/tips.yml` 和 `plugins/BayMcTipsPro/lang/zh_CN.yml`
+4. 编辑 `config.yml` 中的公告开关, 间隔和控制台输出
+5. 编辑 `tips.yml` 中的公告内容
+6. 按需编辑 `lang/zh_CN.yml` 中的命令反馈和日志文本
+7. 执行 `/tips reload` 重载插件, 或重启服务器
+8. 给需要使用命令的玩家或权限组分配 `baymctipspro.command`
 
 ## 命令
 
@@ -87,10 +88,6 @@ announcements:
   interval-seconds: 300
   initial-delay-seconds: 30
   send-to-console: true
-  messages:
-    - "<gold>[公告]</gold> 欢迎来到 <aqua>BayMC</aqua>"
-    - "<green>[主城]</green> <hover:show_text:'点击执行 /spawn'><click:run_command:'/spawn'>点击返回主城</click></hover>"
-    - "<yellow>[官网]</yellow> <hover:show_text:'点击打开官网'><click:open_url:'https://example.com'><underlined>点击访问</underlined></click></hover>"
 ```
 
 配置项说明:
@@ -101,7 +98,6 @@ announcements:
 | `announcements.interval-seconds` | `300` | 自动公告间隔秒数, 小于 `5` 会自动提升到 `5` |
 | `announcements.initial-delay-seconds` | `30` | 启动或重载后的首次公告延迟秒数, 小于 `1` 会自动提升到 `1` |
 | `announcements.send-to-console` | `true` | 是否将已发送公告的纯文本写入控制台 |
-| `announcements.messages` | 示例公告列表 | MiniMessage 公告文本列表 |
 
 `announcements.enabled` 只控制自动定时任务, 即使关闭自动公告, 只要存在有效公告, 仍可使用 `/tips next` 手动发送
 
@@ -109,10 +105,12 @@ announcements:
 
 公告文本只支持 MiniMessage, 不解析 `&a` 这类旧式颜色代码
 
+默认公告文件为 `plugins/BayMcTipsPro/tips.yml`
+
 可使用 MiniMessage 的点击和悬停语法:
 
 ```yaml
-messages:
+tips:
   - "<green>[主城]</green> <hover:show_text:'点击执行 /spawn'><click:run_command:'/spawn'>点击返回主城</click></hover>"
   - "<yellow>[官网]</yellow> <hover:show_text:'点击打开官网'><click:open_url:'https://example.com'><underlined>点击访问</underlined></click></hover>"
 ```

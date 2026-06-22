@@ -27,15 +27,25 @@ final class PluginResourceTest {
     }
 
     @Test
-    void defaultConfigUsesMiniMessageAnnouncementExamples() throws IOException {
+    void defaultConfigKeepsOnlyAnnouncementRuntimeOptions() throws IOException {
         String configYml = Files.readString(Path.of("src/main/resources/config.yml"));
 
         assertTrue(configYml.contains("announcements:"));
         assertTrue(configYml.contains("interval-seconds: 300"));
-        assertTrue(configYml.contains("<click:run_command:'/spawn'>"));
-        assertTrue(configYml.contains("<hover:show_text:'点击打开官网'>"));
+        assertTrue(configYml.contains("send-to-console: true"));
+        assertFalse(configYml.contains("messages:"));
+        assertFalse(configYml.contains("<click:run_command:'/spawn'>"));
+    }
+
+    @Test
+    void defaultTipsUsesMiniMessageAnnouncementExamples() throws IOException {
+        String tipsYml = Files.readString(Path.of("src/main/resources/tips.yml"));
+
+        assertTrue(tipsYml.contains("tips:"));
+        assertTrue(tipsYml.contains("<click:run_command:'/spawn'>"));
+        assertTrue(tipsYml.contains("<hover:show_text:'点击打开官网'>"));
         assertFalse(
-            configYml.lines()
+            tipsYml.lines()
                 .map(String::stripLeading)
                 .filter(line -> line.startsWith("-"))
                 .anyMatch(line -> line.contains("&a")));
@@ -45,14 +55,16 @@ final class PluginResourceTest {
     void defaultConfigAndPluginMetadataUseChineseResourceText() throws IOException {
         String configYml = Files.readString(Path.of("src/main/resources/config.yml"));
         String pluginYml = Files.readString(Path.of("src/main/resources/plugin.yml"));
+        String tipsYml = Files.readString(Path.of("src/main/resources/tips.yml"));
 
-        assertTrue(configYml.contains("BayMcTipsPro 只支持 MiniMessage"));
+        assertTrue(configYml.contains("公告列表请写入 tips.yml"));
+        assertTrue(tipsYml.contains("BayMcTipsPro 只支持 MiniMessage"));
         assertTrue(pluginYml.contains("Paper/Folia 轻量级 MiniMessage 聊天栏公告插件"));
         assertTrue(pluginYml.contains("BayMcTipsPro 主命令"));
         assertTrue(pluginYml.contains("允许使用 BayMcTipsPro 命令"));
         assertFalse(configYml.contains("Legacy color codes"));
         assertFalse(pluginYml.contains("Lightweight MiniMessage chat announcement plugin"));
-        assertFalse(hasChinesePunctuation(configYml + pluginYml));
+        assertFalse(hasChinesePunctuation(configYml + pluginYml + tipsYml));
     }
 
     @Test

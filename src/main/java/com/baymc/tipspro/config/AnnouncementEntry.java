@@ -9,7 +9,7 @@ import net.kyori.adventure.text.Component;
  * 重复解析配置字符串
  *
  * @param index 配置列表中的一基序号
- * @param rawMessage 来自 {@code config.yml} 的原始 MiniMessage 文本
+ * @param rawMessage 来自 {@code tips.yml} 的原始 MiniMessage 文本
  * @param component 可直接发送到聊天栏的 Adventure 组件
  * @param plainText 用于控制台日志的纯文本内容
  */

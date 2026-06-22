@@ -10,7 +10,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 /**
  * BayMcTipsPro 配置在运行时使用的不可变视图
  *
- * <p>加载器会提前完成数值归一化和 MiniMessage 校验, 后续服务只需要使用这个值对象
+ * <p>加载器会从 {@code config.yml} 读取调度配置, 从 {@code tips.yml} 读取公告列表
+ * 并提前完成数值归一化和 MiniMessage 校验, 后续服务只需要使用这个值对象
  * 不再直接接触 Bukkit 配置 API, 也不需要处理解析失败
  *
  * @param enabled 是否启用自动公告任务
@@ -51,10 +52,14 @@ public record PluginConfig(
      * 从 Bukkit 配置对象中加载并校验插件设置
      *
      * @param configuration 从 {@code config.yml} 加载的 Bukkit 配置
+     * @param tipsConfiguration 从 {@code tips.yml} 加载的 Bukkit 配置
      * @param miniMessage 用于校验公告文本的 MiniMessage 解析器
      * @return 已校验的不可变运行配置
      */
-    public static PluginConfig load(FileConfiguration configuration, MiniMessage miniMessage) {
+    public static PluginConfig load(
+        FileConfiguration configuration,
+        FileConfiguration tipsConfiguration,
+        MiniMessage miniMessage) {
         List<ConfigNotice> notices = new ArrayList<>();
         boolean enabled = configuration.getBoolean("announcements.enabled", true);
         int intervalSeconds = normalizeSeconds(
@@ -74,7 +79,7 @@ public record PluginConfig(
 
         List<AnnouncementEntry> validAnnouncements = new ArrayList<>();
         List<InvalidAnnouncement> invalidAnnouncements = new ArrayList<>();
-        List<String> messages = configuration.getStringList("announcements.messages");
+        List<String> messages = tipsConfiguration.getStringList("tips");
         for (int i = 0; i < messages.size(); i++) {
             int index = i + 1;
             String rawMessage = messages.get(i);
@@ -105,7 +110,7 @@ public record PluginConfig(
             notices.add(
                 new ConfigNotice(
                     "validation.messages-empty",
-                    "announcements.messages",
+                    "tips",
                     "",
                     ""));
         }
