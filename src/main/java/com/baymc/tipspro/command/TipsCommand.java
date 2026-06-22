@@ -23,10 +23,19 @@ import org.jetbrains.annotations.NotNull;
  * 和实际分发顺序与约定的用户可见顺序一致
  */
 public final class TipsCommand implements CommandExecutor, TabCompleter {
-    public static final String PERMISSION = "baymctipspro.command";
+    public static final String HELP_PERMISSION = "baymctipspro.help";
+    public static final String INFO_PERMISSION = "baymctipspro.info";
+    public static final String NEXT_PERMISSION = "baymctipspro.next";
+    public static final String STATUS_PERMISSION = "baymctipspro.status";
+    public static final String RELOAD_PERMISSION = "baymctipspro.reload";
 
-    private static final List<String> SUBCOMMANDS =
-        List.of("help", "info", "next", "status", "reload");
+    private static final List<SubcommandPermission> SUBCOMMANDS =
+        List.of(
+            new SubcommandPermission("help", HELP_PERMISSION),
+            new SubcommandPermission("info", INFO_PERMISSION),
+            new SubcommandPermission("next", NEXT_PERMISSION),
+            new SubcommandPermission("status", STATUS_PERMISSION),
+            new SubcommandPermission("reload", RELOAD_PERMISSION));
 
     private final BayMcTipsProPlugin plugin;
     private final MiniMessage miniMessage;
@@ -54,6 +63,16 @@ public final class TipsCommand implements CommandExecutor, TabCompleter {
         }
 
         String subcommand = args.length == 0 ? "info" : args[0].toLowerCase(Locale.ROOT);
+        String permission = permissionFor(subcommand);
+        if (permission == null) {
+            send(sender, "messages.unknown-command");
+            return true;
+        }
+        if (lacksCommandPermission(sender, permission)) {
+            send(sender, "messages.no-permission");
+            return true;
+        }
+
         switch (subcommand) {
             case "help" ->
                 showHelp(sender);
@@ -82,9 +101,10 @@ public final class TipsCommand implements CommandExecutor, TabCompleter {
         }
         String prefix = args[0].toLowerCase(Locale.ROOT);
         List<String> completions = new ArrayList<>();
-        for (String subcommand : SUBCOMMANDS) {
-            if (subcommand.startsWith(prefix)) {
-                completions.add(subcommand);
+        for (SubcommandPermission subcommand : SUBCOMMANDS) {
+            if (subcommand.name().startsWith(prefix)
+                && !lacksCommandPermission(sender, subcommand.permission())) {
+                completions.add(subcommand.name());
             }
         }
         return completions;
@@ -141,8 +161,29 @@ public final class TipsCommand implements CommandExecutor, TabCompleter {
             placeholder("task", plugin.language().runningText(plugin.announcementScheduler().isRunning())));
     }
 
+    private String permissionFor(String subcommand) {
+        for (SubcommandPermission entry : SUBCOMMANDS) {
+            if (entry.name().equals(subcommand)) {
+                return entry.permission();
+            }
+        }
+        return null;
+    }
+
+    private boolean lacksCommandPermission(CommandSender sender, String permission) {
+        return sender instanceof Player && !sender.hasPermission(permission);
+    }
+
     private boolean lacksCommandPermission(CommandSender sender) {
-        return sender instanceof Player && !sender.hasPermission(PERMISSION);
+        if (!(sender instanceof Player)) {
+            return false;
+        }
+        for (SubcommandPermission subcommand : SUBCOMMANDS) {
+            if (sender.hasPermission(subcommand.permission())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void send(
@@ -159,5 +200,8 @@ public final class TipsCommand implements CommandExecutor, TabCompleter {
         for (String message : plugin.language().messages(path, placeholders)) {
             sender.sendMessage(miniMessage.deserialize(message));
         }
+    }
+
+    private record SubcommandPermission(String name, String permission) {
     }
 }

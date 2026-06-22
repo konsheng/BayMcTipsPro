@@ -13,6 +13,18 @@ commands:
     aliases:
       - tips
 permissions:
-  baymctipspro.command:
-    description: 允许使用 BayMcTipsPro 命令
+  baymctipspro.help:
+    description: 允许查看 BayMcTipsPro 命令帮助
+    default: op
+  baymctipspro.info:
+    description: 允许查看 BayMcTipsPro 插件信息
+    default: op
+  baymctipspro.next:
+    description: 允许立即发送随机公告
+    default: op
+  baymctipspro.status:
+    description: 允许查看公告运行状态
+    default: op
+  baymctipspro.reload:
+    description: 允许重载 BayMcTipsPro 配置和语言文件
     default: op

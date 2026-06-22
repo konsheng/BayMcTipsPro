@@ -23,7 +23,12 @@ final class PluginResourceTest {
         assertTrue(pluginYml.contains("- Konsheng"));
         assertTrue(pluginYml.contains("baymctipspro:"));
         assertTrue(pluginYml.contains("- tips"));
-        assertTrue(pluginYml.contains("baymctipspro.command:"));
+        assertTrue(pluginYml.contains("baymctipspro.help:"));
+        assertTrue(pluginYml.contains("baymctipspro.info:"));
+        assertTrue(pluginYml.contains("baymctipspro.next:"));
+        assertTrue(pluginYml.contains("baymctipspro.status:"));
+        assertTrue(pluginYml.contains("baymctipspro.reload:"));
+        assertFalse(pluginYml.contains("baymctipspro.command:"));
     }
 
     @Test
@@ -63,7 +68,8 @@ final class PluginResourceTest {
         assertTrue(tipsYml.contains("BayMcTipsPro 只支持 MiniMessage"));
         assertTrue(pluginYml.contains("Paper/Folia 轻量级 MiniMessage 聊天栏公告插件"));
         assertTrue(pluginYml.contains("BayMcTipsPro 主命令"));
-        assertTrue(pluginYml.contains("允许使用 BayMcTipsPro 命令"));
+        assertTrue(pluginYml.contains("允许查看 BayMcTipsPro 命令帮助"));
+        assertTrue(pluginYml.contains("允许重载 BayMcTipsPro 配置和语言文件"));
         assertFalse(configYml.contains("Legacy color codes"));
         assertFalse(pluginYml.contains("Lightweight MiniMessage chat announcement plugin"));
         assertFalse(hasChinesePunctuation(configYml + pluginYml + tipsYml));

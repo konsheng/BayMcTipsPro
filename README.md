@@ -45,7 +45,7 @@ BayMcTipsPro 是一个面向 Paper 和 Folia 的轻量级聊天栏公告插件, 
 5. 编辑 `tips.yml` 中的公告内容
 6. 按需编辑 `language.file` 指向的语言文件中的命令反馈和日志文本
 7. 执行 `/tips reload` 重载插件, 或重启服务器
-8. 给需要使用命令的玩家或权限组分配 `baymctipspro.command`
+8. 给需要使用命令的玩家或权限组分配对应子命令权限
 
 ## 命令
 
@@ -61,22 +61,24 @@ BayMcTipsPro 是一个面向 Paper 和 Folia 的轻量级聊天栏公告插件, 
 
 | 命令 | 说明 | 权限 |
 | --- | --- | --- |
-| `/tips` | 查看插件信息 | `baymctipspro.command` |
-| `/tips help` | 查看命令帮助 | `baymctipspro.command` |
-| `/tips info` | 查看插件信息 | `baymctipspro.command` |
-| `/tips next` | 立即发送一条随机公告 | `baymctipspro.command` |
-| `/tips status` | 查看公告运行状态 | `baymctipspro.command` |
-| `/tips reload` | 重载配置和语言文件 | `baymctipspro.command` |
+| `/tips` | 查看插件信息 | `baymctipspro.info` |
+| `/tips help` | 查看命令帮助 | `baymctipspro.help` |
+| `/tips info` | 查看插件信息 | `baymctipspro.info` |
+| `/tips next` | 立即发送一条随机公告 | `baymctipspro.next` |
+| `/tips status` | 查看公告运行状态 | `baymctipspro.status` |
+| `/tips reload` | 重载配置和语言文件 | `baymctipspro.reload` |
 
-玩家执行命令需要 `baymctipspro.command` 权限, 控制台可直接执行命令
+玩家执行命令需要对应子命令权限, 控制台可直接执行命令
 
 ## 权限
 
 | 权限 | 默认 | 说明 |
 | --- | --- | --- |
-| `baymctipspro.command` | OP | 允许使用 BayMcTipsPro 命令 |
-
-插件不区分管理员权限和用户权限, 所有命令共用同一个权限节点
+| `baymctipspro.help` | OP | 允许查看命令帮助 |
+| `baymctipspro.info` | OP | 允许查看插件信息 |
+| `baymctipspro.next` | OP | 允许立即发送随机公告 |
+| `baymctipspro.status` | OP | 允许查看公告运行状态 |
+| `baymctipspro.reload` | OP | 允许重载配置和语言文件 |
 
 ## 配置
 
