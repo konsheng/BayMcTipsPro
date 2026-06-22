@@ -3,9 +3,12 @@ plugins {
 }
 
 group = "com.baymc.tipspro"
-version = "1.0.0"
 
-val pluginVersion = version.toString()
+val baseVersion = "1.0.0-SNAPSHOT"
+val gitCommitShort = providers.gradleProperty("gitCommitShort").orElse("unknown")
+val artifactVersion = providers.gradleProperty("artifactVersionOverride").orElse(baseVersion).get()
+
+version = artifactVersion
 
 repositories {
     mavenCentral()
@@ -34,12 +37,32 @@ tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.add("-Xlint:deprecation")
 }
 
+tasks.withType<Jar>().configureEach {
+    archiveBaseName.set("BayMcTipsPro")
+    manifest {
+        attributes(
+            "Implementation-Title" to "BayMcTipsPro",
+            "Implementation-Version" to artifactVersion,
+            "Git-Commit-Short" to gitCommitShort.get(),
+        )
+    }
+}
+
 tasks.processResources {
+    filteringCharset = "UTF-8"
     filesMatching("plugin.yml") {
-        expand("version" to pluginVersion)
+        expand("version" to artifactVersion)
     }
 }
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.register("printVersion") {
+    group = "versioning"
+    description = "输出开发版发布标签使用的基础项目版本"
+    doLast {
+        println(baseVersion)
+    }
 }
