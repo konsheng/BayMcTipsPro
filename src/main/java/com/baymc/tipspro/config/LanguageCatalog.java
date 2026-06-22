@@ -5,40 +5,40 @@ import java.util.List;
 import org.bukkit.configuration.file.FileConfiguration;
 
 /**
- * Reads MiniMessage runtime text from lang/zh_CN.yml.
+ * 从 {@code lang/zh_CN.yml} 读取 MiniMessage 运行时文本
  *
- * <p>Command feedback, status labels, validation notices, and console logs all pass through this
- * catalog so visible wording can be adjusted without changing Java source.
+ * <p>命令反馈, 状态标签, 校验提示和控制台日志都会经过这个目录读取, 让可见文案可以在不修改
+ * Java 源码的情况下调整
  */
 public final class LanguageCatalog {
     private final FileConfiguration config;
 
     /**
-     * Creates a language catalog backed by a Bukkit YAML configuration.
+     * 创建基于 Bukkit YAML 配置的语言文本目录
      *
-     * @param config loaded lang/zh_CN.yml configuration
+     * @param config 已加载的 {@code lang/zh_CN.yml} 配置
      */
     public LanguageCatalog(FileConfiguration config) {
         this.config = config;
     }
 
     /**
-     * Reads one language entry and applies placeholder replacements.
+     * 读取一条语言文本, 并执行占位符替换
      *
-     * @param path language key
-     * @param placeholders replacement values
-     * @return formatted message, or the key itself when missing
+     * @param path 语言键
+     * @param placeholders 替换值
+     * @return 格式化后的文本, 缺失时返回语言键本身
      */
     public String message(String path, Placeholder... placeholders) {
         return apply(raw(path), placeholders);
     }
 
     /**
-     * Reads a language list and applies placeholder replacements to each line.
+     * 读取语言文本列表, 并对每一行执行占位符替换
      *
-     * @param path language list key
-     * @param placeholders replacement values
-     * @return formatted message list, or a one-line key marker when missing
+     * @param path 语言列表键
+     * @param placeholders 替换值
+     * @return 格式化后的文本列表, 缺失时返回只包含语言键的一行列表
      */
     public List<String> messages(String path, Placeholder... placeholders) {
         List<String> values = config.getStringList(path);
@@ -53,40 +53,40 @@ public final class LanguageCatalog {
     }
 
     /**
-     * Formats an enabled or disabled state label.
+     * 格式化启用或禁用状态标签
      *
-     * @param enabled state value
-     * @return localized state label
+     * @param enabled 状态值
+     * @return 本地化后的状态标签
      */
     public String enabledText(boolean enabled) {
         return message(enabled ? "words.enabled" : "words.disabled");
     }
 
     /**
-     * Formats a running or stopped task state label.
+     * 格式化运行中或未运行任务状态标签
      *
-     * @param running task state
-     * @return localized task state label
+     * @param running 任务状态
+     * @return 本地化后的任务状态标签
      */
     public String runningText(boolean running) {
         return message(running ? "words.running" : "words.stopped");
     }
 
     /**
-     * Formats the scheduler mode used by status and startup logs.
+     * 格式化状态命令和启动日志使用的调度模式
      *
-     * @param folia whether Folia scheduling is active
-     * @return localized scheduler mode label
+     * @param folia 是否正在使用 Folia 调度
+     * @return 本地化后的调度模式标签
      */
     public String schedulerMode(boolean folia) {
         return message(folia ? "scheduler.folia" : "scheduler.bukkit");
     }
 
     /**
-     * Formats an invalid announcement reason.
+     * 格式化无效公告原因
      *
-     * @param invalidAnnouncement invalid announcement metadata
-     * @return localized reason text
+     * @param invalidAnnouncement 无效公告元数据
+     * @return 本地化后的原因文本
      */
     public String invalidReason(InvalidAnnouncement invalidAnnouncement) {
         return message(
@@ -95,10 +95,10 @@ public final class LanguageCatalog {
     }
 
     /**
-     * Formats a non-fatal configuration notice.
+     * 格式化非致命配置提示
      *
-     * @param notice configuration notice metadata
-     * @return localized notice text
+     * @param notice 配置提示元数据
+     * @return 本地化后的提示文本
      */
     public String notice(ConfigNotice notice) {
         return message(
@@ -109,11 +109,11 @@ public final class LanguageCatalog {
     }
 
     /**
-     * Creates a placeholder replacement.
+     * 创建占位符替换项
      *
-     * @param key placeholder name without surrounding percent signs
-     * @param value replacement value
-     * @return placeholder descriptor
+     * @param key 不包含百分号的占位符名称
+     * @param value 替换值
+     * @return 占位符描述
      */
     public static Placeholder placeholder(String key, Object value) {
         return new Placeholder("%" + key + "%", String.valueOf(value));
@@ -133,10 +133,10 @@ public final class LanguageCatalog {
     }
 
     /**
-     * One resolved placeholder replacement pair.
+     * 一组已经解析的占位符替换项
      *
-     * @param token token including percent signs
-     * @param value replacement value
+     * @param token 包含百分号的占位符
+     * @param value 替换值
      */
     public record Placeholder(String token, String value) {
     }

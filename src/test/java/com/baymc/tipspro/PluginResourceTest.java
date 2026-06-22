@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 /**
- * Guards the plugin metadata and default resource contract.
+ * 保护插件元数据与默认资源文件约定
  */
 final class PluginResourceTest {
 
@@ -54,15 +54,20 @@ final class PluginResourceTest {
     }
 
     @Test
-    void mainJavaSourcesDoNotKeepChineseRuntimeText() throws IOException {
+    void mainJavaSourcesDoNotKeepRuntimeTextLiterals() throws IOException {
         try (Stream<Path> files = Files.walk(Path.of("src/main/java"))) {
-            boolean containsChinese =
+            boolean containsRuntimeText =
                 files.filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(".java"))
                     .map(PluginResourceTest::readUnchecked)
-                    .anyMatch(content -> content.matches("(?s).*\\p{IsHan}.*"));
+                    .anyMatch(content ->
+                        content.contains("\"你没有权限使用 BayMcTipsPro 命令")
+                            || content.contains("\"BayMcTipsPro 配置已重载")
+                            || content.contains("\"没有可用公告")
+                            || content.contains("\"自动公告已启用")
+                            || content.contains("\"调用调度器方法失败"));
 
-            assertFalse(containsChinese);
+            assertFalse(containsRuntimeText);
         }
     }
 

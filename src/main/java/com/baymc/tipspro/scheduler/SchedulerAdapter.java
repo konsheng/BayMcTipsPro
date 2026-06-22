@@ -11,11 +11,10 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
 /**
- * Small runtime adapter over Bukkit and Folia global scheduling APIs.
+ * Bukkit 与 Folia 全局调度 API 的轻量运行时适配器
  *
- * <p>Folia classes are accessed reflectively so the same jar can load on normal Paper servers.
- * BayMcTipsPro only needs global timer work because it sends chat messages and never touches
- * region-owned world state.
+ * <p>Folia 类通过反射访问, 因此同一个 jar 可以在普通 Paper 服务器上加载, BayMcTipsPro 只发送
+ * 聊天消息, 不触碰由区域线程拥有的世界状态, 所以这里只需要全局定时任务能力
  */
 public final class SchedulerAdapter {
     private final Plugin plugin;
@@ -23,10 +22,10 @@ public final class SchedulerAdapter {
     private final boolean folia;
 
     /**
-     * Creates a scheduler adapter and detects whether the server is Folia.
+     * 创建调度适配器, 并检测当前服务器是否为 Folia
      *
-     * @param plugin owning Bukkit plugin
-     * @param languageSupplier current language catalog supplier for runtime error text
+     * @param plugin 所属 Bukkit 插件
+     * @param languageSupplier 当前语言文本目录供应器, 用于运行时错误文本
      */
     public SchedulerAdapter(Plugin plugin, Supplier<LanguageCatalog> languageSupplier) {
         this.plugin = plugin;
@@ -35,21 +34,21 @@ public final class SchedulerAdapter {
     }
 
     /**
-     * Returns whether this server exposes Folia's regionized runtime marker class.
+     * 返回当前服务器是否暴露 Folia 区域化运行时标记类
      *
-     * @return true when Folia is detected
+     * @return 检测到 Folia 时返回 {@code true}
      */
     public boolean isFolia() {
         return folia;
     }
 
     /**
-     * Starts a repeating global task.
+     * 启动一个重复执行的全局任务
      *
-     * @param runnable task body to execute
-     * @param delayTicks delay before the first run, in server ticks
-     * @param periodTicks delay between later runs, in server ticks
-     * @return cancellable scheduled task handle
+     * @param runnable 要执行的任务内容
+     * @param delayTicks 首次执行前的延迟, 单位为服务器 tick
+     * @param periodTicks 后续两次执行之间的间隔, 单位为服务器 tick
+     * @return 可取消的调度任务句柄
      */
     public ScheduledTaskHandle runGlobalTimer(
         Runnable runnable,
@@ -129,18 +128,18 @@ public final class SchedulerAdapter {
     }
 
     /**
-     * Cancellable handle returned by the scheduler adapter.
+     * 调度适配器返回的可取消任务句柄
      */
     public interface ScheduledTaskHandle {
         /**
-         * Cancels the scheduled task.
+         * 取消调度任务
          */
         void cancel();
 
         /**
-         * Returns whether the scheduled task has already been cancelled.
+         * 返回调度任务是否已经被取消
          *
-         * @return true when the task is cancelled
+         * @return 任务已取消时返回 {@code true}
          */
         boolean isCancelled();
     }

@@ -1,16 +1,15 @@
 package com.baymc.tipspro.config;
 
 /**
- * Describes an announcement entry that could not be accepted during configuration loading.
+ * 描述加载配置时无法接受的公告条目
  *
- * <p>Invalid entries are skipped instead of failing the whole plugin, which keeps reload safe
- * even when an administrator is testing MiniMessage syntax. The reason is stored as a language
- * key so visible validation text remains in lang/zh_CN.yml.
+ * <p>无效条目会被跳过, 而不是让整个插件加载失败, 管理员测试 MiniMessage 语法时
+ * 重载流程仍然安全, 失败原因保存为语言键, 具体提示文本仍由 {@code lang/zh_CN.yml} 提供
  *
- * @param index one-based index in the configured message list
- * @param rawMessage original text from config.yml
- * @param reasonKey language key for the rejection reason
- * @param detail optional parser detail for diagnostics
+ * @param index 配置列表中的一基序号
+ * @param rawMessage 来自 {@code config.yml} 的原始文本
+ * @param reasonKey 拒绝该条目的原因语言键
+ * @param detail 用于诊断的可选解析细节
  */
 public record InvalidAnnouncement(
     int index,

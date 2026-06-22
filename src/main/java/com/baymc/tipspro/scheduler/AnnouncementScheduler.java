@@ -4,10 +4,9 @@ import com.baymc.tipspro.config.PluginConfig;
 import com.baymc.tipspro.service.AnnouncementService;
 
 /**
- * Controls the lifecycle of the automatic announcement timer.
+ * 控制自动公告定时任务的生命周期
  *
- * <p>Reload always cancels the old task first, then starts a new one only when automatic
- * announcements are enabled and at least one valid announcement exists.
+ * <p>重载时会先取消旧任务, 再仅在自动公告已启用且至少存在一条有效公告时启动新任务
  */
 public final class AnnouncementScheduler {
     private static final long TICKS_PER_SECOND = 20L;
@@ -17,10 +16,10 @@ public final class AnnouncementScheduler {
     private SchedulerAdapter.ScheduledTaskHandle taskHandle;
 
     /**
-     * Creates a scheduler manager for announcement timers.
+     * 创建公告定时任务管理器
      *
-     * @param schedulerAdapter Paper/Folia scheduler adapter
-     * @param announcementService service invoked by the timer
+     * @param schedulerAdapter Paper/Folia 调度适配器
+     * @param announcementService 定时任务调用的公告服务
      */
     public AnnouncementScheduler(
         SchedulerAdapter schedulerAdapter,
@@ -30,9 +29,9 @@ public final class AnnouncementScheduler {
     }
 
     /**
-     * Restarts the timer according to the supplied configuration.
+     * 根据给定配置重启定时任务
      *
-     * @param config validated runtime configuration
+     * @param config 已校验的运行配置
      */
     public void restart(PluginConfig config) {
         stop();
@@ -46,7 +45,7 @@ public final class AnnouncementScheduler {
     }
 
     /**
-     * Cancels the active timer when one exists.
+     * 取消当前正在运行的定时任务
      */
     public void stop() {
         if (taskHandle != null && !taskHandle.isCancelled()) {
@@ -56,9 +55,9 @@ public final class AnnouncementScheduler {
     }
 
     /**
-     * Returns whether an automatic announcement timer is currently active.
+     * 返回当前是否存在活跃的自动公告定时任务
      *
-     * @return true when a timer handle exists and has not been cancelled
+     * @return 任务句柄存在且未被取消时返回 {@code true}
      */
     public boolean isRunning() {
         return taskHandle != null && !taskHandle.isCancelled();

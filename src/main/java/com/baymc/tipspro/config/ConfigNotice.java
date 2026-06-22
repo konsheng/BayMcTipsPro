@@ -1,15 +1,15 @@
 package com.baymc.tipspro.config;
 
 /**
- * Describes a non-fatal configuration notice discovered while loading config.yml.
+ * 描述加载 {@code config.yml} 时发现的非致命配置提示
  *
- * <p>The notice stores a language key plus structured values instead of ready-made text, allowing
- * runtime wording to stay in lang/zh_CN.yml.
+ * <p>提示只保存语言键和结构化数值, 不直接保存完整文本, 从而让运行时文案继续集中在
+ * {@code lang/zh_CN.yml} 中
  *
- * @param messageKey language key used to format the notice
- * @param path configuration path related to the notice
- * @param value actual configured value, when relevant
- * @param minimum normalized minimum value, when relevant
+ * @param messageKey 用于格式化提示的语言键
+ * @param path 与提示相关的配置路径
+ * @param value 实际配置值
+ * @param minimum 归一化后的最小值
  */
 public record ConfigNotice(
     String messageKey,

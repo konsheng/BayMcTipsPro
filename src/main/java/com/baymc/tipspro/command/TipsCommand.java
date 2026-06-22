@@ -18,10 +18,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Handles the /baymctipspro command and its /tips alias.
+ * 处理 {@code /baymctipspro} 命令及 {@code /tips} 别名
  *
- * <p>The subcommand order is intentionally fixed as help, info, next, status, reload so command
- * help, tab completion, and implementation dispatch all match the agreed user-facing order.
+ * <p>子命令顺序固定为 help, info, next, status, reload, 用于保证帮助文本, Tab 补全
+ * 和实际分发顺序与约定的用户可见顺序一致
  */
 public final class TipsCommand implements CommandExecutor, TabCompleter {
     public static final String PERMISSION = "baymctipspro.command";
@@ -33,10 +33,10 @@ public final class TipsCommand implements CommandExecutor, TabCompleter {
     private final MiniMessage miniMessage;
 
     /**
-     * Creates the command handler.
+     * 创建命令处理器
      *
-     * @param plugin plugin facade used to access runtime services
-     * @param miniMessage parser used for command feedback components
+     * @param plugin 用于访问运行时服务的插件实例
+     * @param miniMessage 用于解析命令反馈文本的 MiniMessage 解析器
      */
     public TipsCommand(BayMcTipsProPlugin plugin, MiniMessage miniMessage) {
         this.plugin = plugin;

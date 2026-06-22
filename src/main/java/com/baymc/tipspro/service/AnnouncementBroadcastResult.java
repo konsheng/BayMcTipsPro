@@ -3,11 +3,11 @@ package com.baymc.tipspro.service;
 import com.baymc.tipspro.config.AnnouncementEntry;
 
 /**
- * Result returned after an announcement broadcast attempt.
+ * 公告广播尝试后的返回结果
  *
- * @param sent whether a valid announcement was selected and delivered to the broadcast path
- * @param onlinePlayers number of online players targeted at the time of broadcast
- * @param announcement selected announcement, or null when no announcement was available
+ * @param sent 是否已经选择有效公告并进入广播路径
+ * @param onlinePlayers 广播时目标在线玩家数量
+ * @param announcement 已选择的公告, 没有可用公告时为 {@code null}
  */
 public record AnnouncementBroadcastResult(
     boolean sent,
@@ -15,20 +15,20 @@ public record AnnouncementBroadcastResult(
     AnnouncementEntry announcement) {
 
     /**
-     * Creates a result for the no-valid-announcement case.
+     * 创建没有可用公告时的结果
      *
-     * @return unsuccessful broadcast result
+     * @return 未成功广播的结果
      */
     public static AnnouncementBroadcastResult noAnnouncement() {
         return new AnnouncementBroadcastResult(false, 0, null);
     }
 
     /**
-     * Creates a successful broadcast result.
+     * 创建成功广播后的结果
      *
-     * @param onlinePlayers number of online players targeted
-     * @param announcement selected announcement entry
-     * @return successful broadcast result
+     * @param onlinePlayers 目标在线玩家数量
+     * @param announcement 已选择的公告条目
+     * @return 成功广播的结果
      */
     public static AnnouncementBroadcastResult sent(
         int onlinePlayers,

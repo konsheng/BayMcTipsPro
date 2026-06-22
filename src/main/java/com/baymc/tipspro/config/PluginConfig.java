@@ -8,18 +8,18 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.configuration.file.FileConfiguration;
 
 /**
- * Immutable runtime view of BayMcTipsPro's configuration.
+ * BayMcTipsPro 配置在运行时使用的不可变视图
  *
- * <p>The loader performs all normalization and MiniMessage validation up front. Services can then
- * use this value object without touching Bukkit configuration APIs or handling parse failures.
+ * <p>加载器会提前完成数值归一化和 MiniMessage 校验, 后续服务只需要使用这个值对象
+ * 不再直接接触 Bukkit 配置 API, 也不需要处理解析失败
  *
- * @param enabled whether the automatic scheduled task is enabled
- * @param intervalSeconds normalized automatic announcement interval in seconds
- * @param initialDelaySeconds normalized startup or reload delay in seconds
- * @param sendToConsole whether sent announcements should be logged as plain text
- * @param validAnnouncements validated announcements ready for broadcast
- * @param invalidAnnouncements rejected announcement entries
- * @param notices non-fatal normalization notices gathered while loading
+ * @param enabled 是否启用自动公告任务
+ * @param intervalSeconds 归一化后的自动公告间隔, 单位为秒
+ * @param initialDelaySeconds 归一化后的启动或重载后首次延迟, 单位为秒
+ * @param sendToConsole 是否将已发送公告以纯文本形式写入控制台
+ * @param validAnnouncements 已通过校验, 可以广播的公告
+ * @param invalidAnnouncements 被拒绝的公告条目
+ * @param notices 加载时收集到的非致命归一化提示
  */
 public record PluginConfig(
     boolean enabled,
@@ -39,7 +39,7 @@ public record PluginConfig(
         PlainTextComponentSerializer.plainText();
 
     /**
-     * Copies collections defensively so consumers cannot mutate live runtime state.
+     * 防御性复制集合, 避免调用方修改运行时状态
      */
     public PluginConfig {
         validAnnouncements = List.copyOf(validAnnouncements);
@@ -48,11 +48,11 @@ public record PluginConfig(
     }
 
     /**
-     * Loads and validates plugin settings from Bukkit's configuration object.
+     * 从 Bukkit 配置对象中加载并校验插件设置
      *
-     * @param configuration Bukkit configuration loaded from config.yml
-     * @param miniMessage MiniMessage parser used for announcement validation
-     * @return immutable validated runtime configuration
+     * @param configuration 从 {@code config.yml} 加载的 Bukkit 配置
+     * @param miniMessage 用于校验公告文本的 MiniMessage 解析器
+     * @return 已校验的不可变运行配置
      */
     public static PluginConfig load(FileConfiguration configuration, MiniMessage miniMessage) {
         List<ConfigNotice> notices = new ArrayList<>();
@@ -121,27 +121,27 @@ public record PluginConfig(
     }
 
     /**
-     * Returns whether at least one announcement can be sent.
+     * 返回是否至少存在一条可以发送的公告
      *
-     * @return true when the validated announcement list is not empty
+     * @return 已校验公告列表非空时返回 {@code true}
      */
     public boolean hasValidAnnouncements() {
         return !validAnnouncements.isEmpty();
     }
 
     /**
-     * Returns the number of valid announcements.
+     * 返回有效公告数量
      *
-     * @return validated announcement count
+     * @return 已通过校验的公告数量
      */
     public int validAnnouncementCount() {
         return validAnnouncements.size();
     }
 
     /**
-     * Returns the number of invalid announcements.
+     * 返回无效公告数量
      *
-     * @return rejected announcement count
+     * @return 被拒绝的公告数量
      */
     public int invalidAnnouncementCount() {
         return invalidAnnouncements.size();

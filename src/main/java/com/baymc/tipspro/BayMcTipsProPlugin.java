@@ -16,12 +16,11 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
- * Composition root for the BayMcTipsPro Paper/Folia plugin.
+ * BayMcTipsPro 在 Paper 与 Folia 环境中的插件组装入口
  *
- * <p>The plugin stays intentionally narrow: it loads MiniMessage chat announcements, validates
- * them, starts one Folia-aware global timer, and exposes the /baymctipspro command with /tips as
- * an alias. World, chunk, entity, database, GUI, title, action bar, and boss bar features are
- * outside this plugin's responsibility.
+ * <p>插件只负责加载和校验 MiniMessage 聊天栏公告, 启动一个兼容 Folia 的全局定时任务
+ * 并注册 {@code /baymctipspro} 命令及 {@code /tips} 别名, 世界, 区块, 实体, 数据库
+ * GUI, 标题, 动作栏和 BossBar 都不属于这个插件的职责范围
  */
 public final class BayMcTipsProPlugin extends JavaPlugin {
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
@@ -60,9 +59,9 @@ public final class BayMcTipsProPlugin extends JavaPlugin {
     }
 
     /**
-     * Reloads config.yml, validates announcements, and restarts the automatic timer.
+     * 重新加载 {@code config.yml} 与语言文件, 校验公告并重启自动公告任务
      *
-     * @return active validated configuration after reload
+     * @return 重载后的有效运行配置
      */
     public PluginConfig reloadAnnouncements() {
         reloadConfig();
@@ -75,45 +74,45 @@ public final class BayMcTipsProPlugin extends JavaPlugin {
     }
 
     /**
-     * Returns the active validated runtime configuration.
+     * 返回当前已经校验过的运行配置
      *
-     * @return current plugin configuration
+     * @return 当前插件配置
      */
     public PluginConfig currentConfig() {
         return currentConfig;
     }
 
     /**
-     * Returns the announcement delivery service used by commands and the timer.
+     * 返回命令和定时任务共用的公告发送服务
      *
-     * @return announcement service
+     * @return 公告发送服务
      */
     public AnnouncementService announcementService() {
         return announcementService;
     }
 
     /**
-     * Returns the automatic announcement scheduler.
+     * 返回自动公告任务调度器
      *
-     * @return announcement scheduler
+     * @return 公告调度器
      */
     public AnnouncementScheduler announcementScheduler() {
         return announcementScheduler;
     }
 
     /**
-     * Returns the active Paper/Folia scheduler adapter.
+     * 返回当前使用的 Paper/Folia 调度适配器
      *
-     * @return scheduler adapter
+     * @return 调度适配器
      */
     public SchedulerAdapter schedulerAdapter() {
         return schedulerAdapter;
     }
 
     /**
-     * Returns the active language catalog.
+     * 返回当前语言文本目录
      *
-     * @return runtime language catalog
+     * @return 运行时语言文本目录
      */
     public LanguageCatalog language() {
         return language;

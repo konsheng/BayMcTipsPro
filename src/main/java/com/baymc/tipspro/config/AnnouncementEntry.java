@@ -3,15 +3,15 @@ package com.baymc.tipspro.config;
 import net.kyori.adventure.text.Component;
 
 /**
- * Represents one validated announcement from the configuration file.
+ * 表示一条已经通过校验的公告配置
  *
- * <p>The raw MiniMessage text is kept for diagnostics, while the parsed component and plain text
- * are cached so scheduled broadcasts never need to re-parse configuration strings.
+ * <p>原始 MiniMessage 文本会保留用于诊断, 解析后的组件和纯文本会被缓存, 避免定时广播时
+ * 重复解析配置字符串
  *
- * @param index one-based index in the configured message list
- * @param rawMessage original MiniMessage text from config.yml
- * @param component parsed Adventure component ready for chat delivery
- * @param plainText plain-text form used for console logging
+ * @param index 配置列表中的一基序号
+ * @param rawMessage 来自 {@code config.yml} 的原始 MiniMessage 文本
+ * @param component 可直接发送到聊天栏的 Adventure 组件
+ * @param plainText 用于控制台日志的纯文本内容
  */
 public record AnnouncementEntry(
     int index,
