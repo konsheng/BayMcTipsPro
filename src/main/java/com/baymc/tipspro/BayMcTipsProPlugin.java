@@ -151,7 +151,7 @@ public final class BayMcTipsProPlugin extends JavaPlugin {
             getLogger().info(language.message("logs.automatic-disabled"));
             return;
         }
-        if (!config.hasValidAnnouncements()) {
+        if (config.hasNoValidAnnouncements()) {
             getLogger().warning(language.message("logs.no-valid-announcements"));
             return;
         }
@@ -205,9 +205,6 @@ public final class BayMcTipsProPlugin extends JavaPlugin {
 
     private String configuredLanguageFile() {
         String configured = getConfig().getString("language.file", DEFAULT_LANGUAGE_FILE);
-        if (configured == null) {
-            return DEFAULT_LANGUAGE_FILE;
-        }
         String fileName = configured.trim();
         if (fileName.isBlank()
             || fileName.contains("/")

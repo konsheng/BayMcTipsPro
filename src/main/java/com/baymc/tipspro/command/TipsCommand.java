@@ -15,7 +15,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * 处理 {@code /baymctipspro} 命令及 {@code /tips} 别名
@@ -48,48 +47,37 @@ public final class TipsCommand implements CommandExecutor, TabCompleter {
         @NotNull CommandSender sender,
         @NotNull Command command,
         @NotNull String label,
-        @NotNull String[] args) {
-        if (!hasCommandPermission(sender)) {
+        @NotNull String @NotNull [] args) {
+        if (lacksCommandPermission(sender)) {
             send(sender, "messages.no-permission");
             return true;
         }
 
         String subcommand = args.length == 0 ? "info" : args[0].toLowerCase(Locale.ROOT);
-        return switch (subcommand) {
-            case "help" -> {
+        switch (subcommand) {
+            case "help" ->
                 showHelp(sender);
-                yield true;
-            }
-            case "info" -> {
+            case "info" ->
                 showInfo(sender);
-                yield true;
-            }
-            case "next" -> {
+            case "next" ->
                 sendNext(sender);
-                yield true;
-            }
-            case "status" -> {
+            case "status" ->
                 showStatus(sender);
-                yield true;
-            }
-            case "reload" -> {
+            case "reload" ->
                 reload(sender);
-                yield true;
-            }
-            default -> {
+            default ->
                 send(sender, "messages.unknown-command");
-                yield true;
-            }
-        };
+        }
+        return true;
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(
+    public @NotNull List<String> onTabComplete(
         @NotNull CommandSender sender,
         @NotNull Command command,
         @NotNull String alias,
-        @NotNull String[] args) {
-        if (!hasCommandPermission(sender) || args.length != 1) {
+        @NotNull String @NotNull [] args) {
+        if (lacksCommandPermission(sender) || args.length != 1) {
             return List.of();
         }
         String prefix = args[0].toLowerCase(Locale.ROOT);
@@ -153,8 +141,8 @@ public final class TipsCommand implements CommandExecutor, TabCompleter {
             placeholder("task", plugin.language().runningText(plugin.announcementScheduler().isRunning())));
     }
 
-    private boolean hasCommandPermission(CommandSender sender) {
-        return !(sender instanceof Player) || sender.hasPermission(PERMISSION);
+    private boolean lacksCommandPermission(CommandSender sender) {
+        return sender instanceof Player && !sender.hasPermission(PERMISSION);
     }
 
     private void send(

@@ -35,7 +35,7 @@ public final class AnnouncementScheduler {
      */
     public void restart(PluginConfig config) {
         stop();
-        if (!config.enabled() || !config.hasValidAnnouncements()) {
+        if (!config.enabled() || config.hasNoValidAnnouncements()) {
             return;
         }
         taskHandle = schedulerAdapter.runGlobalTimer(
@@ -48,7 +48,7 @@ public final class AnnouncementScheduler {
      * 取消当前正在运行的定时任务
      */
     public void stop() {
-        if (taskHandle != null && !taskHandle.isCancelled()) {
+        if (taskHandle != null && taskHandle.isActive()) {
             taskHandle.cancel();
         }
         taskHandle = null;
@@ -60,7 +60,7 @@ public final class AnnouncementScheduler {
      * @return 任务句柄存在且未被取消时返回 {@code true}
      */
     public boolean isRunning() {
-        return taskHandle != null && !taskHandle.isCancelled();
+        return taskHandle != null && taskHandle.isActive();
     }
 
     private static long secondsToTicks(int seconds) {

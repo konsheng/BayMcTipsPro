@@ -126,12 +126,12 @@ public record PluginConfig(
     }
 
     /**
-     * 返回是否至少存在一条可以发送的公告
+     * 返回是否不存在可以发送的公告
      *
-     * @return 已校验公告列表非空时返回 {@code true}
+     * @return 已校验公告列表为空时返回 {@code true}
      */
-    public boolean hasValidAnnouncements() {
-        return !validAnnouncements.isEmpty();
+    public boolean hasNoValidAnnouncements() {
+        return validAnnouncements.isEmpty();
     }
 
     /**

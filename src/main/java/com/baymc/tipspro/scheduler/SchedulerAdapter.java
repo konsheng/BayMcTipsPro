@@ -17,6 +17,9 @@ import org.bukkit.scheduler.BukkitTask;
  * 聊天消息, 不触碰由区域线程拥有的世界状态, 所以这里只需要全局定时任务能力
  */
 public final class SchedulerAdapter {
+    private static final String FOLIA_RUNTIME_CLASS =
+        "io.papermc.paper.threadedregions.RegionizedServer";
+
     private final Plugin plugin;
     private final Supplier<LanguageCatalog> languageSupplier;
     private final boolean folia;
@@ -30,7 +33,7 @@ public final class SchedulerAdapter {
     public SchedulerAdapter(Plugin plugin, Supplier<LanguageCatalog> languageSupplier) {
         this.plugin = plugin;
         this.languageSupplier = languageSupplier;
-        this.folia = classExists("io.papermc.paper.threadedregions.RegionizedServer");
+        this.folia = foliaRuntimeAvailable();
     }
 
     /**
@@ -74,9 +77,9 @@ public final class SchedulerAdapter {
         return new FoliaScheduledTaskHandle(task, languageSupplier);
     }
 
-    private static boolean classExists(String className) {
+    private static boolean foliaRuntimeAvailable() {
         try {
-            Class.forName(className);
+            Class.forName(FOLIA_RUNTIME_CLASS);
             return true;
         } catch (ClassNotFoundException ignored) {
             return false;
@@ -137,11 +140,11 @@ public final class SchedulerAdapter {
         void cancel();
 
         /**
-         * 返回调度任务是否已经被取消
+         * 返回调度任务是否仍然活跃
          *
-         * @return 任务已取消时返回 {@code true}
+         * @return 任务仍然活跃时返回 {@code true}
          */
-        boolean isCancelled();
+        boolean isActive();
     }
 
     private record BukkitScheduledTaskHandle(BukkitTask task) implements ScheduledTaskHandle {
@@ -151,8 +154,8 @@ public final class SchedulerAdapter {
         }
 
         @Override
-        public boolean isCancelled() {
-            return task.isCancelled();
+        public boolean isActive() {
+            return !task.isCancelled();
         }
     }
 
@@ -165,9 +168,9 @@ public final class SchedulerAdapter {
         }
 
         @Override
-        public boolean isCancelled() {
+        public boolean isActive() {
             Object cancelled = invokeScheduledTask(task, "isCancelled", languageSupplier);
-            return cancelled instanceof Boolean value && value;
+            return !(cancelled instanceof Boolean value) || !value;
         }
     }
 }
