@@ -17,8 +17,19 @@ import org.bukkit.plugin.Plugin;
  * 定时发送和手动发送共用同一套随机选择与广播路径
  */
 public final class AnnouncementService {
+    /**
+     * 所属 Bukkit 插件, 用于写入控制台日志
+     */
     private final Plugin plugin;
+
+    /**
+     * 当前广播使用的配置快照
+     */
     private volatile PluginConfig config;
+
+    /**
+     * 当前控制台日志使用的语言文本目录
+     */
     private volatile LanguageCatalog language;
 
     /**

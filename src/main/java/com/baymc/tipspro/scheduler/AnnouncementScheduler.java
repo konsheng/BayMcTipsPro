@@ -9,10 +9,24 @@ import com.baymc.tipspro.service.AnnouncementService;
  * <p>重载时会先取消旧任务, 再仅在自动公告已启用且至少存在一条有效公告时启动新任务
  */
 public final class AnnouncementScheduler {
+    /**
+     * Minecraft 服务端每秒默认 tick 数
+     */
     private static final long TICKS_PER_SECOND = 20L;
 
+    /**
+     * Paper/Folia 全局调度适配器
+     */
     private final SchedulerAdapter schedulerAdapter;
+
+    /**
+     * 定时任务触发时调用的公告服务
+     */
     private final AnnouncementService announcementService;
+
+    /**
+     * 当前自动公告任务句柄, 没有运行任务时为 {@code null}
+     */
     private SchedulerAdapter.ScheduledTaskHandle taskHandle;
 
     /**
@@ -63,6 +77,12 @@ public final class AnnouncementScheduler {
         return taskHandle != null && taskHandle.isActive();
     }
 
+    /**
+     * 将秒数转换为 Bukkit 和 Folia 使用的 tick 数
+     *
+     * @param seconds 秒数
+     * @return 至少为一 tick 的调度时间
+     */
     private static long secondsToTicks(int seconds) {
         return Math.max(1L, seconds * TICKS_PER_SECOND);
     }

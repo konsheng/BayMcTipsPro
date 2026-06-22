@@ -17,11 +17,25 @@ import org.bukkit.scheduler.BukkitTask;
  * 聊天消息, 不触碰由区域线程拥有的世界状态, 所以这里只需要全局定时任务能力
  */
 public final class SchedulerAdapter {
+    /**
+     * Folia 运行时暴露的区域化服务器标记类名
+     */
     private static final String FOLIA_RUNTIME_CLASS =
         "io.papermc.paper.threadedregions.RegionizedServer";
 
+    /**
+     * 所属 Bukkit 插件, 用于注册调度任务
+     */
     private final Plugin plugin;
+
+    /**
+     * 当前语言文本目录供应器, 用于反射失败时生成错误文本
+     */
     private final Supplier<LanguageCatalog> languageSupplier;
+
+    /**
+     * 当前运行时是否检测到 Folia
+     */
     private final boolean folia;
 
     /**
@@ -77,6 +91,11 @@ public final class SchedulerAdapter {
         return new FoliaScheduledTaskHandle(task, languageSupplier);
     }
 
+    /**
+     * 检测当前运行时是否存在 Folia 标记类
+     *
+     * @return Folia 标记类可加载时返回 {@code true}
+     */
     private static boolean foliaRuntimeAvailable() {
         try {
             Class.forName(FOLIA_RUNTIME_CLASS);
@@ -86,6 +105,15 @@ public final class SchedulerAdapter {
         }
     }
 
+    /**
+     * 通过反射调用目标对象方法, 并将失败原因转换为本地化运行时异常
+     *
+     * @param target 反射调用目标对象
+     * @param methodName 方法名称
+     * @param parameterTypes 方法参数类型
+     * @param args 方法实参
+     * @return 反射方法返回值
+     */
     private Object invoke(
         Object target,
         String methodName,
@@ -105,6 +133,14 @@ public final class SchedulerAdapter {
         }
     }
 
+    /**
+     * 通过反射调用 Folia 任务句柄方法
+     *
+     * @param task Folia 返回的 ScheduledTask 实例
+     * @param methodName 要调用的任务方法名
+     * @param languageSupplier 当前语言文本目录供应器
+     * @return 任务方法返回值, 任务为空时返回 {@code null}
+     */
     private static Object invokeScheduledTask(
         Object task,
         String methodName,
@@ -147,26 +183,53 @@ public final class SchedulerAdapter {
         boolean isActive();
     }
 
+    /**
+     * Bukkit 调度任务句柄包装
+     *
+     * @param task Bukkit 原生任务
+     */
     private record BukkitScheduledTaskHandle(BukkitTask task) implements ScheduledTaskHandle {
+        /**
+         * 取消 Bukkit 调度任务
+         */
         @Override
         public void cancel() {
             task.cancel();
         }
 
+        /**
+         * 返回 Bukkit 任务是否未被取消
+         *
+         * @return 任务未取消时返回 {@code true}
+         */
         @Override
         public boolean isActive() {
             return !task.isCancelled();
         }
     }
 
+    /**
+     * Folia 调度任务句柄包装
+     *
+     * @param task Folia 原生任务对象
+     * @param languageSupplier 当前语言文本目录供应器
+     */
     private record FoliaScheduledTaskHandle(
         Object task,
         Supplier<LanguageCatalog> languageSupplier) implements ScheduledTaskHandle {
+        /**
+         * 取消 Folia 调度任务
+         */
         @Override
         public void cancel() {
             invokeScheduledTask(task, "cancel", languageSupplier);
         }
 
+        /**
+         * 返回 Folia 任务是否未被取消
+         *
+         * @return 任务未取消或无法解析取消状态时返回 {@code true}
+         */
         @Override
         public boolean isActive() {
             Object cancelled = invokeScheduledTask(task, "isCancelled", languageSupplier);

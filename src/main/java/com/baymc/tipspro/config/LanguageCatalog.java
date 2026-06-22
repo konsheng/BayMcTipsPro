@@ -11,6 +11,9 @@ import org.bukkit.configuration.file.FileConfiguration;
  * Java 源码的情况下调整
  */
 public final class LanguageCatalog {
+    /**
+     * 已加载的 Bukkit 语言文件配置
+     */
     private final FileConfiguration config;
 
     /**
@@ -119,11 +122,24 @@ public final class LanguageCatalog {
         return new Placeholder("%" + key + "%", String.valueOf(value));
     }
 
+    /**
+     * 读取未格式化的语言文本
+     *
+     * @param path 语言键
+     * @return 语言文件中的文本, 缺失或为空时返回语言键
+     */
     private String raw(String path) {
         String value = config.getString(path);
         return value == null || value.isBlank() ? path : value;
     }
 
+    /**
+     * 对文本执行简单占位符替换
+     *
+     * @param value 原始文本
+     * @param placeholders 占位符替换值
+     * @return 替换后的文本
+     */
     private static String apply(String value, Placeholder... placeholders) {
         String formatted = value;
         for (Placeholder placeholder : placeholders) {

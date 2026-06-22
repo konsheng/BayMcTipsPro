@@ -23,17 +23,57 @@ import org.bukkit.plugin.java.JavaPlugin;
  * GUI, 标题, 动作栏和 BossBar 都不属于这个插件的职责范围
  */
 public final class BayMcTipsProPlugin extends JavaPlugin {
+    /**
+     * 配置未指定有效语言文件时使用的默认文件名
+     */
     private static final String DEFAULT_LANGUAGE_FILE = "zh_CN.yml";
+
+    /**
+     * 插件数据目录下保存语言文件的目录名
+     */
     private static final String LANGUAGE_DIRECTORY = "lang";
 
+    /**
+     * 解析公告和命令反馈文本的 MiniMessage 实例
+     */
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
 
+    /**
+     * 当前运行时使用的 Paper/Folia 调度适配器
+     */
     private SchedulerAdapter schedulerAdapter;
+
+    /**
+     * 当前运行时使用的公告广播服务
+     */
     private AnnouncementService announcementService;
+
+    /**
+     * 当前运行时使用的自动公告任务管理器
+     */
     private AnnouncementScheduler announcementScheduler;
+
+    /**
+     * 当前已经加载和校验的配置快照
+     */
     private PluginConfig currentConfig;
+
+    /**
+     * 当前已经加载的语言文本目录
+     */
     private LanguageCatalog language;
 
+    /**
+     * 创建插件主类实例
+     *
+     * <p>Bukkit 在加载插件时通过无参构造器实例化主类
+     */
+    public BayMcTipsProPlugin() {
+    }
+
+    /**
+     * 初始化默认资源, 运行时服务, 命令和自动公告任务
+     */
     @Override
     public void onEnable() {
         saveDefaultConfig();
@@ -52,6 +92,9 @@ public final class BayMcTipsProPlugin extends JavaPlugin {
                     placeholder("scheduler", language.schedulerMode(schedulerAdapter.isFolia()))));
     }
 
+    /**
+     * 停止自动公告任务并输出插件关闭日志
+     */
     @Override
     public void onDisable() {
         if (announcementScheduler != null) {
@@ -123,6 +166,9 @@ public final class BayMcTipsProPlugin extends JavaPlugin {
         return language;
     }
 
+    /**
+     * 注册主命令执行器和 Tab 补全器
+     */
     private void registerCommand() {
         PluginCommand command = getCommand("baymctipspro");
         if (command == null) {
@@ -134,6 +180,11 @@ public final class BayMcTipsProPlugin extends JavaPlugin {
         command.setTabCompleter(tipsCommand);
     }
 
+    /**
+     * 输出配置归一化提示, 无效公告提示和自动公告任务状态
+     *
+     * @param config 已加载并校验的运行配置
+     */
     private void logConfigState(PluginConfig config) {
         for (ConfigNotice notice : config.notices()) {
             getLogger().warning(language.notice(notice));
@@ -165,14 +216,25 @@ public final class BayMcTipsProPlugin extends JavaPlugin {
                     placeholder("initial_delay", config.initialDelaySeconds())));
     }
 
+    /**
+     * 按当前配置选择语言文件并重建语言文本目录
+     */
     private void reloadLanguage() {
         language = new LanguageCatalog(YamlConfiguration.loadConfiguration(languageFile()));
     }
 
+    /**
+     * 加载独立公告文件
+     *
+     * @return 从 {@code tips.yml} 读取的 Bukkit YAML 配置
+     */
     private YamlConfiguration loadTipsConfiguration() {
         return YamlConfiguration.loadConfiguration(tipsFile());
     }
 
+    /**
+     * 在数据目录不存在公告文件时保存默认公告文件
+     */
     private void saveDefaultTipsConfig() {
         File tipsFile = tipsFile();
         if (!tipsFile.exists()) {
@@ -180,6 +242,9 @@ public final class BayMcTipsProPlugin extends JavaPlugin {
         }
     }
 
+    /**
+     * 在语言目录不存在默认语言文件时保存默认语言文件
+     */
     private void saveDefaultLanguageConfig() {
         File defaultLanguageFile = new File(languageDirectory(), DEFAULT_LANGUAGE_FILE);
         if (!defaultLanguageFile.exists()) {
@@ -187,6 +252,11 @@ public final class BayMcTipsProPlugin extends JavaPlugin {
         }
     }
 
+    /**
+     * 返回当前应使用的语言文件, 配置无效或文件不存在时回退到默认语言文件
+     *
+     * @return 可读取的语言文件
+     */
     private File languageFile() {
         File selectedFile = new File(languageDirectory(), configuredLanguageFile());
         if (selectedFile.isFile()) {
@@ -195,14 +265,29 @@ public final class BayMcTipsProPlugin extends JavaPlugin {
         return new File(languageDirectory(), DEFAULT_LANGUAGE_FILE);
     }
 
+    /**
+     * 返回公告文件路径
+     *
+     * @return 插件数据目录下的 {@code tips.yml}
+     */
     private File tipsFile() {
         return new File(getDataFolder(), "tips.yml");
     }
 
+    /**
+     * 返回语言文件目录路径
+     *
+     * @return 插件数据目录下的语言目录
+     */
     private File languageDirectory() {
         return new File(getDataFolder(), LANGUAGE_DIRECTORY);
     }
 
+    /**
+     * 读取并校验配置中的语言文件名
+     *
+     * @return 安全的语言文件名
+     */
     private String configuredLanguageFile() {
         String configured = getConfig().getString("language.file", DEFAULT_LANGUAGE_FILE);
         String fileName = configured.trim();

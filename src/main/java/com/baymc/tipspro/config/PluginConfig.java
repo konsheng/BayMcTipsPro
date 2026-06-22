@@ -31,11 +31,29 @@ public record PluginConfig(
     List<InvalidAnnouncement> invalidAnnouncements,
     List<ConfigNotice> notices) {
 
+    /**
+     * 默认自动公告间隔秒数
+     */
     public static final int DEFAULT_INTERVAL_SECONDS = 300;
+
+    /**
+     * 默认首次公告延迟秒数
+     */
     public static final int DEFAULT_INITIAL_DELAY_SECONDS = 30;
+
+    /**
+     * 自动公告间隔允许的最小秒数
+     */
     public static final int MIN_INTERVAL_SECONDS = 5;
+
+    /**
+     * 首次公告延迟允许的最小秒数
+     */
     public static final int MIN_INITIAL_DELAY_SECONDS = 1;
 
+    /**
+     * 将 Adventure 组件转换为控制台纯文本的序列化器
+     */
     private static final PlainTextComponentSerializer PLAIN_TEXT =
         PlainTextComponentSerializer.plainText();
 
@@ -152,6 +170,15 @@ public record PluginConfig(
         return invalidAnnouncements.size();
     }
 
+    /**
+     * 将低于最小值的秒数提升到最小值, 并记录配置提示
+     *
+     * @param value 原始配置值
+     * @param minimum 允许的最小值
+     * @param path 配置路径
+     * @param notices 用于追加提示的列表
+     * @return 归一化后的秒数
+     */
     private static int normalizeSeconds(
         int value,
         int minimum,
@@ -169,6 +196,12 @@ public record PluginConfig(
         return minimum;
     }
 
+    /**
+     * 提取异常消息, 异常没有消息时使用异常类名
+     *
+     * @param exception MiniMessage 解析时抛出的异常
+     * @return 可写入诊断文本的异常摘要
+     */
     private static String messageOf(RuntimeException exception) {
         String message = exception.getMessage();
         if (message == null || message.isBlank()) {
