@@ -20,6 +20,7 @@ final class PluginResourceTest {
 
         assertTrue(pluginYml.contains("main: com.baymc.tipspro.BayMcTipsProPlugin"));
         assertTrue(pluginYml.contains("folia-supported: true"));
+        assertTrue(pluginYml.contains("- Konsheng"));
         assertTrue(pluginYml.contains("baymctipspro:"));
         assertTrue(pluginYml.contains("- tips"));
         assertTrue(pluginYml.contains("baymctipspro.command:"));
@@ -41,6 +42,20 @@ final class PluginResourceTest {
     }
 
     @Test
+    void defaultConfigAndPluginMetadataUseChineseResourceText() throws IOException {
+        String configYml = Files.readString(Path.of("src/main/resources/config.yml"));
+        String pluginYml = Files.readString(Path.of("src/main/resources/plugin.yml"));
+
+        assertTrue(configYml.contains("BayMcTipsPro 只支持 MiniMessage"));
+        assertTrue(pluginYml.contains("Paper/Folia 轻量级 MiniMessage 聊天栏公告插件"));
+        assertTrue(pluginYml.contains("BayMcTipsPro 主命令"));
+        assertTrue(pluginYml.contains("允许使用 BayMcTipsPro 命令"));
+        assertFalse(configYml.contains("Legacy color codes"));
+        assertFalse(pluginYml.contains("Lightweight MiniMessage chat announcement plugin"));
+        assertFalse(hasChinesePunctuation(configYml + pluginYml));
+    }
+
+    @Test
     void defaultLanguageFileContainsRuntimeMessageSections() throws IOException {
         String languageYml = Files.readString(Path.of("src/main/resources/lang/zh_CN.yml"));
 
@@ -58,8 +73,7 @@ final class PluginResourceTest {
         String languageYml = Files.readString(Path.of("src/main/resources/lang/zh_CN.yml"));
 
         assertFalse(
-            languageYml.chars()
-                .anyMatch(character -> "\uFF0C\u3002\uFF1B\uFF1A\u3001\uFF01\uFF1F".indexOf(character) >= 0));
+            hasChinesePunctuation(languageYml));
         assertFalse(
             languageYml.lines()
                 .map(String::stripTrailing)
@@ -90,5 +104,10 @@ final class PluginResourceTest {
         } catch (IOException exception) {
             throw new IllegalStateException(exception);
         }
+    }
+
+    private static boolean hasChinesePunctuation(String content) {
+        return content.chars()
+            .anyMatch(character -> "\uFF0C\u3002\uFF1B\uFF1A\u3001\uFF01\uFF1F".indexOf(character) >= 0);
     }
 }

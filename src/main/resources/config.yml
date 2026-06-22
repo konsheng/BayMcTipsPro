@@ -1,20 +1,19 @@
-# BayMcTipsPro only supports MiniMessage. Legacy color codes such as &a are not parsed.
+# BayMcTipsPro 只支持 MiniMessage, 不解析 &a 这类旧式颜色代码
 announcements:
-  # Enables the automatic scheduled announcement task. The /tips next command can still send
-  # a random announcement manually when this is disabled, as long as valid messages exist.
+  # 是否启用自动公告定时任务, 关闭后仍可使用 /tips next 手动发送随机公告
   enabled: true
 
-  # Seconds between automatic announcements. Values lower than 5 are raised to 5.
+  # 自动公告间隔秒数, 小于 5 时会自动提升到 5
   interval-seconds: 300
 
-  # Seconds before the first automatic announcement after startup or reload.
-  # Values lower than 1 are raised to 1.
+  # 启动或重载后首次自动公告延迟秒数
+  # 小于 1 时会自动提升到 1
   initial-delay-seconds: 30
 
-  # Logs the plain-text form of every sent announcement to the console.
+  # 是否将每次发送公告的纯文本内容写入控制台
   send-to-console: true
 
-  # Every entry is parsed as MiniMessage and may use click, hover, URL, and command events.
+  # 每条公告都会按 MiniMessage 解析, 可使用点击, 悬停, URL 和命令事件
   messages:
     - "<gold>[公告]</gold> 欢迎来到 <aqua>BayMC</aqua>"
     - "<green>[主城]</green> <hover:show_text:'点击执行 /spawn'><click:run_command:'/spawn'>点击返回主城</click></hover>"

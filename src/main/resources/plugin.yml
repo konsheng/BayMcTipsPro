@@ -4,15 +4,15 @@ main: com.baymc.tipspro.BayMcTipsProPlugin
 api-version: '26.1.2'
 folia-supported: true
 authors:
-  - BayMC
-description: Lightweight MiniMessage chat announcement plugin for Paper and Folia
+  - Konsheng
+description: Paper/Folia 轻量级 MiniMessage 聊天栏公告插件
 commands:
   baymctipspro:
-    description: BayMcTipsPro command
+    description: BayMcTipsPro 主命令
     usage: /baymctipspro <help|info|next|status|reload>
     aliases:
       - tips
 permissions:
   baymctipspro.command:
-    description: Use BayMcTipsPro commands
+    description: 允许使用 BayMcTipsPro 命令
     default: op
