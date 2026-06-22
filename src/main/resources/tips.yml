@@ -1,6 +1,14 @@
 # BayMcTipsPro 只支持 MiniMessage, 不解析 &a 这类旧式颜色代码
 # 每条公告都会按 MiniMessage 解析, 可使用点击, 悬停, URL 和命令事件
+# 支持字符串写法, 也支持带 sound 的对象写法
+# sound.name 使用 Minecraft 声音 key, 可省略 minecraft: 命名空间
+# sound.source 支持 master, music, record, weather, block, hostile, neutral, player, ambient, voice, ui
 tips:
-  - "<gold>[公告]</gold> 欢迎来到 <aqua>BayMC</aqua>"
+  - message: "<gold>[公告]</gold> 欢迎来到 <aqua>BayMC</aqua>"
+    sound:
+      name: "minecraft:block.note_block.pling"
+      source: "ui"
+      volume: 1.0
+      pitch: 1.0
   - "<green>[主城]</green> <hover:show_text:'点击执行 /spawn'><click:run_command:'/spawn'>点击返回主城</click></hover>"
   - "<yellow>[官网]</yellow> <hover:show_text:'点击打开官网'><click:open_url:'https://example.com'><underlined>点击访问</underlined></click></hover>"

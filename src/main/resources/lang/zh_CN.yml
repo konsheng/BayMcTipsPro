@@ -46,6 +46,13 @@ messages:
 validation:
   blank-message: "公告内容为空"
   parse-error: "MiniMessage 解析失败: %detail%"
+  unsupported-tip-entry: "公告格式不支持: %detail%"
+  unsupported-sound-entry: "公告声音格式不支持: %detail%"
+  blank-sound-name: "公告声音名称为空"
+  invalid-sound-name: "公告声音名称无效: %detail%"
+  invalid-sound-source: "公告声音分类无效: %detail%"
+  invalid-sound-volume: "公告声音音量不能小于 0: %detail%"
+  invalid-sound-pitch: "公告声音音调必须大于 0: %detail%"
   minimum-raised: "%path% 配置值为 %value%, 已提升到 %minimum%"
   messages-empty: "%path% 为空, 自动公告不会启动"
 

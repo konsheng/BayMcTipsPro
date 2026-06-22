@@ -1,13 +1,14 @@
 # BayMcTipsPro
 
-BayMcTipsPro 是一个面向 Paper 和 Folia 的轻量级聊天栏公告插件, 只负责向全服在线玩家发送 MiniMessage 聊天公告
+BayMcTipsPro 是一个面向 Paper 和 Folia 的轻量级聊天栏公告插件, 负责向全服在线玩家发送 MiniMessage 聊天公告和可选公告声音
 
-插件不提供 GUI, ActionBar, Title, BossBar, Sound 或跨服广播能力, 适合只需要简单聊天栏公告的小型服务器和登录服
+插件不提供 GUI, ActionBar, Title, BossBar 或跨服广播能力, 适合只需要简单聊天栏公告的小型服务器和登录服
 
 ## ✨ 功能特性
 
 - 支持 Paper 和 Folia, Folia 环境使用全局调度器执行定时任务
 - 支持 MiniMessage 公告文本, 可使用颜色, 悬停, 点击, URL 和命令事件
+- 支持为单条公告配置可选声音, 使用 Adventure sound key 播放
 - 支持从配置文件随机选择一条有效公告发送给所有在线玩家
 - 支持自动定时公告, 可配置首次延迟和公告间隔
 - 支持 `/tips next` 手动立即发送一条随机公告
@@ -117,9 +118,25 @@ announcements:
 
 ```yaml
 tips:
+  - message: "<gold>[公告]</gold> 欢迎来到 <aqua>BayMC</aqua>"
+    sound:
+      name: "minecraft:block.note_block.pling"
+      source: "ui"
+      volume: 1.0
+      pitch: 1.0
   - "<green>[主城]</green> <hover:show_text:'点击执行 /spawn'><click:run_command:'/spawn'>点击返回主城</click></hover>"
   - "<yellow>[官网]</yellow> <hover:show_text:'点击打开官网'><click:open_url:'https://example.com'><underlined>点击访问</underlined></click></hover>"
 ```
+
+`tips` 支持纯字符串公告, 也支持对象公告, 对象公告使用 `message` 保存 MiniMessage 文本, 使用可选 `sound` 配置声音
+
+| 声音项 | 默认值 | 说明 |
+| --- | --- | --- |
+| `sound.enabled` | `true` | 是否启用当前公告的声音 |
+| `sound.name` | 无 | Minecraft 声音 key, 可省略 `minecraft:` 命名空间 |
+| `sound.source` | `master` | 声音分类, 支持 `master`, `music`, `record`, `weather`, `block`, `hostile`, `neutral`, `player`, `ambient`, `voice`, `ui` |
+| `sound.volume` | `1.0` | 声音音量, 不能小于 `0` |
+| `sound.pitch` | `1.0` | 声音音调, 必须大于 `0` |
 
 ## 🌐 语言文件
 

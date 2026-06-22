@@ -72,6 +72,9 @@ public final class AnnouncementService {
         int onlinePlayers = 0;
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.sendMessage(announcement.component());
+            if (announcement.sound() != null) {
+                player.playSound(announcement.sound().toAdventureSound());
+            }
             onlinePlayers++;
         }
 

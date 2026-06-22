@@ -64,6 +64,8 @@ final class PluginResourceTest {
         String tipsYml = Files.readString(Path.of("src/main/resources/tips.yml"));
 
         assertTrue(tipsYml.contains("tips:"));
+        assertTrue(tipsYml.contains("sound:"));
+        assertTrue(tipsYml.contains("minecraft:block.note_block.pling"));
         assertTrue(tipsYml.contains("<click:run_command:'/spawn'>"));
         assertTrue(tipsYml.contains("<hover:show_text:'点击打开官网'>"));
         assertFalse(

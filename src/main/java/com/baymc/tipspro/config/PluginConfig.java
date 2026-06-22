@@ -2,9 +2,13 @@ package com.baymc.tipspro.config;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.sound.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 
 /**
@@ -52,6 +56,21 @@ public record PluginConfig(
     public static final int MIN_INITIAL_DELAY_SECONDS = 1;
 
     /**
+     * 默认声音分类
+     */
+    private static final Sound.Source DEFAULT_SOUND_SOURCE = Sound.Source.MASTER;
+
+    /**
+     * 默认声音音量
+     */
+    private static final float DEFAULT_SOUND_VOLUME = 1.0F;
+
+    /**
+     * 默认声音音调
+     */
+    private static final float DEFAULT_SOUND_PITCH = 1.0F;
+
+    /**
      * 将 Adventure 组件转换为控制台纯文本的序列化器
      */
     private static final PlainTextComponentSerializer PLAIN_TEXT =
@@ -97,34 +116,44 @@ public record PluginConfig(
 
         List<AnnouncementEntry> validAnnouncements = new ArrayList<>();
         List<InvalidAnnouncement> invalidAnnouncements = new ArrayList<>();
-        List<String> messages = tipsConfiguration.getStringList("tips");
-        for (int i = 0; i < messages.size(); i++) {
+        List<?> entries = tipsConfiguration.getList("tips", List.of());
+        for (int i = 0; i < entries.size(); i++) {
             int index = i + 1;
-            String rawMessage = messages.get(i);
-            if (rawMessage == null || rawMessage.isBlank()) {
+            AnnouncementSource source = announcementSource(index, entries.get(i));
+            if (source.invalidAnnouncement() != null) {
+                invalidAnnouncements.add(source.invalidAnnouncement());
+                continue;
+            }
+            if (source.message().isBlank()) {
                 invalidAnnouncements.add(
                     new InvalidAnnouncement(index, "", "validation.blank-message", ""));
                 continue;
             }
+            SoundLoadResult soundResult = soundFrom(index, source.soundConfig());
+            if (soundResult.invalidAnnouncement() != null) {
+                invalidAnnouncements.add(soundResult.invalidAnnouncement());
+                continue;
+            }
             try {
-                Component component = miniMessage.deserialize(rawMessage);
+                Component component = miniMessage.deserialize(source.message());
                 validAnnouncements.add(
                     new AnnouncementEntry(
                         index,
-                        rawMessage,
+                        source.message(),
                         component,
-                        PLAIN_TEXT.serialize(component)));
+                        PLAIN_TEXT.serialize(component),
+                        soundResult.sound()));
             } catch (RuntimeException exception) {
                 invalidAnnouncements.add(
                     new InvalidAnnouncement(
                         index,
-                        rawMessage,
+                        source.message(),
                         "validation.parse-error",
                         messageOf(exception)));
             }
         }
 
-        if (messages.isEmpty()) {
+        if (entries.isEmpty()) {
             notices.add(
                 new ConfigNotice(
                     "validation.messages-empty",
@@ -171,6 +200,211 @@ public record PluginConfig(
     }
 
     /**
+     * 从 tips 列表项提取公告文本和可选声音配置
+     *
+     * @param index 公告一基序号
+     * @param entry tips 列表中的原始条目
+     * @return 公告文本来源描述
+     */
+    private static AnnouncementSource announcementSource(int index, Object entry) {
+        if (entry instanceof String message) {
+            return AnnouncementSource.valid(message, null);
+        }
+        if (entry instanceof Map<?, ?> map) {
+            Object message = map.get("message");
+            return AnnouncementSource.valid(stringValue(message), map.get("sound"));
+        }
+        return AnnouncementSource.invalid(
+            new InvalidAnnouncement(
+                index,
+                "",
+                "validation.unsupported-tip-entry",
+                className(entry)));
+    }
+
+    /**
+     * 从公告声音配置中加载声音对象
+     *
+     * @param index 公告一基序号
+     * @param soundConfig 原始声音配置
+     * @return 声音加载结果
+     */
+    private static SoundLoadResult soundFrom(int index, Object soundConfig) {
+        if (soundConfig == null) {
+            return SoundLoadResult.valid(null);
+        }
+        if (soundConfig instanceof String soundName) {
+            return soundFrom(index, soundName, DEFAULT_SOUND_SOURCE, DEFAULT_SOUND_VOLUME, DEFAULT_SOUND_PITCH);
+        }
+        if (!(soundConfig instanceof Map<?, ?> map)) {
+            return SoundLoadResult.invalid(
+                new InvalidAnnouncement(
+                    index,
+                    "",
+                    "validation.unsupported-sound-entry",
+                    className(soundConfig)));
+        }
+
+        if (!booleanValue(map.get("enabled"), true)) {
+            return SoundLoadResult.valid(null);
+        }
+        String soundName = stringValue(map.get("name"));
+        Sound.Source source = sourceFrom(stringValue(map.get("source")));
+        if (source == null) {
+            return SoundLoadResult.invalid(
+                new InvalidAnnouncement(
+                    index,
+                    "",
+                    "validation.invalid-sound-source",
+                    stringValue(map.get("source"))));
+        }
+
+        Float volume = floatValue(map.get("volume"), DEFAULT_SOUND_VOLUME);
+        if (volume == null || volume < 0.0F) {
+            return SoundLoadResult.invalid(
+                new InvalidAnnouncement(
+                    index,
+                    "",
+                    "validation.invalid-sound-volume",
+                    stringValue(map.get("volume"))));
+        }
+
+        Float pitch = floatValue(map.get("pitch"), DEFAULT_SOUND_PITCH);
+        if (pitch == null || pitch <= 0.0F) {
+            return SoundLoadResult.invalid(
+                new InvalidAnnouncement(
+                    index,
+                    "",
+                    "validation.invalid-sound-pitch",
+                    stringValue(map.get("pitch"))));
+        }
+
+        return soundFrom(index, soundName, source, volume, pitch);
+    }
+
+    /**
+     * 根据声音名称和数值构建声音配置
+     *
+     * @param index 公告一基序号
+     * @param soundName 声音名称
+     * @param source 声音分类
+     * @param volume 音量
+     * @param pitch 音调
+     * @return 声音加载结果
+     */
+    private static SoundLoadResult soundFrom(
+        int index,
+        String soundName,
+        Sound.Source source,
+        float volume,
+        float pitch) {
+        String normalizedName = normalizeSoundName(soundName);
+        if (normalizedName.isBlank()) {
+            return SoundLoadResult.invalid(
+                new InvalidAnnouncement(index, "", "validation.blank-sound-name", ""));
+        }
+        if (!Key.parseable(normalizedName)) {
+            return SoundLoadResult.invalid(
+                new InvalidAnnouncement(
+                    index,
+                    "",
+                    "validation.invalid-sound-name",
+                    normalizedName));
+        }
+        return SoundLoadResult.valid(
+            new AnnouncementSound(Key.key(normalizedName), source, volume, pitch));
+    }
+
+    /**
+     * 读取声音分类, 未配置时使用默认分类
+     *
+     * @param rawSource 原始声音分类文本
+     * @return 声音分类, 文本无效时返回 {@code null}
+     */
+    private static Sound.Source sourceFrom(String rawSource) {
+        if (rawSource.isBlank()) {
+            return DEFAULT_SOUND_SOURCE;
+        }
+        try {
+            return Sound.Source.valueOf(rawSource.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
+    }
+
+    /**
+     * 补齐声音名称的默认命名空间
+     *
+     * @param soundName 原始声音名称
+     * @return 可交给 Adventure Key 解析的声音名称
+     */
+    private static String normalizeSoundName(String soundName) {
+        String normalized = soundName.trim().toLowerCase(Locale.ROOT);
+        if (normalized.isBlank() || normalized.contains(":")) {
+            return normalized;
+        }
+        return Key.MINECRAFT_NAMESPACE + ":" + normalized;
+    }
+
+    /**
+     * 将配置值读取为字符串
+     *
+     * @param value 原始配置值
+     * @return 字符串形式, 空值返回空字符串
+     */
+    private static String stringValue(Object value) {
+        return value == null ? "" : String.valueOf(value);
+    }
+
+    /**
+     * 将配置值读取为布尔值
+     *
+     * @param value 原始配置值
+     * @param fallback 默认值
+     * @return 布尔配置值
+     */
+    private static boolean booleanValue(Object value, boolean fallback) {
+        if (value == null) {
+            return fallback;
+        }
+        if (value instanceof Boolean booleanValue) {
+            return booleanValue;
+        }
+        return Boolean.parseBoolean(String.valueOf(value));
+    }
+
+    /**
+     * 将配置值读取为浮点数
+     *
+     * @param value 原始配置值
+     * @param fallback 默认值
+     * @return 浮点配置值, 无法解析时返回 {@code null}
+     */
+    private static Float floatValue(Object value, float fallback) {
+        if (value == null) {
+            return fallback;
+        }
+        if (value instanceof Number number) {
+            return number.floatValue();
+        }
+        try {
+            return Float.parseFloat(String.valueOf(value));
+        } catch (NumberFormatException exception) {
+            return null;
+        }
+    }
+
+    /**
+     * 返回配置值的类名
+     *
+     * @param value 原始配置值
+     * @return 配置值类名
+     */
+    private static String className(Object value) {
+        return value == null ? "null" : value.getClass().getSimpleName();
+    }
+
+    /**
      * 将低于最小值的秒数提升到最小值, 并记录配置提示
      *
      * @param value 原始配置值
@@ -208,5 +442,70 @@ public record PluginConfig(
             return exception.getClass().getSimpleName();
         }
         return message;
+    }
+
+    /**
+     * tips 列表项解析结果
+     *
+     * @param message 公告 MiniMessage 文本
+     * @param soundConfig 原始声音配置
+     * @param invalidAnnouncement 无法解析时生成的无效公告
+     */
+    private record AnnouncementSource(
+        String message,
+        Object soundConfig,
+        InvalidAnnouncement invalidAnnouncement) {
+
+        /**
+         * 创建有效公告来源
+         *
+         * @param message 公告 MiniMessage 文本
+         * @param soundConfig 原始声音配置
+         * @return 有效公告来源
+         */
+        private static AnnouncementSource valid(String message, Object soundConfig) {
+            return new AnnouncementSource(message, soundConfig, null);
+        }
+
+        /**
+         * 创建无效公告来源
+         *
+         * @param invalidAnnouncement 无效公告描述
+         * @return 无效公告来源
+         */
+        private static AnnouncementSource invalid(InvalidAnnouncement invalidAnnouncement) {
+            return new AnnouncementSource("", null, invalidAnnouncement);
+        }
+    }
+
+    /**
+     * 声音配置解析结果
+     *
+     * @param sound 可播放声音配置, 没有声音时为 {@code null}
+     * @param invalidAnnouncement 无法解析时生成的无效公告
+     */
+    private record SoundLoadResult(
+        AnnouncementSound sound,
+        InvalidAnnouncement invalidAnnouncement) {
+
+        /**
+         * 创建有效声音解析结果
+         *
+         * @param sound 可播放声音配置, 没有声音时为 {@code null}
+         * @return 有效声音解析结果
+         */
+        private static SoundLoadResult valid(AnnouncementSound sound) {
+            return new SoundLoadResult(sound, null);
+        }
+
+        /**
+         * 创建无效声音解析结果
+         *
+         * @param invalidAnnouncement 无效公告描述
+         * @return 无效声音解析结果
+         */
+        private static SoundLoadResult invalid(InvalidAnnouncement invalidAnnouncement) {
+            return new SoundLoadResult(null, invalidAnnouncement);
+        }
     }
 }

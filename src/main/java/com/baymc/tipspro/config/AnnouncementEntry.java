@@ -12,10 +12,12 @@ import net.kyori.adventure.text.Component;
  * @param rawMessage 来自 {@code tips.yml} 的原始 MiniMessage 文本
  * @param component 可直接发送到聊天栏的 Adventure 组件
  * @param plainText 用于控制台日志的纯文本内容
+ * @param sound 公告附带的可选声音配置, 没有声音时为 {@code null}
  */
 public record AnnouncementEntry(
     int index,
     String rawMessage,
     Component component,
-    String plainText) {
+    String plainText,
+    AnnouncementSound sound) {
 }
