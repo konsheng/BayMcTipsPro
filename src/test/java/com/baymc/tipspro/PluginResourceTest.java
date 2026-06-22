@@ -54,6 +54,19 @@ final class PluginResourceTest {
     }
 
     @Test
+    void defaultLanguageFileUsesRequiredChineseTextStyle() throws IOException {
+        String languageYml = Files.readString(Path.of("src/main/resources/lang/zh_CN.yml"));
+
+        assertFalse(
+            languageYml.chars()
+                .anyMatch(character -> "\uFF0C\u3002\uFF1B\uFF1A\u3001\uFF01\uFF1F".indexOf(character) >= 0));
+        assertFalse(
+            languageYml.lines()
+                .map(String::stripTrailing)
+                .anyMatch(line -> line.matches(".*[.,;:!?](</[^>]+>)*\"$")));
+    }
+
+    @Test
     void mainJavaSourcesDoNotKeepRuntimeTextLiterals() throws IOException {
         try (Stream<Path> files = Files.walk(Path.of("src/main/java"))) {
             boolean containsRuntimeText =
