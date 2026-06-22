@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -37,5 +38,39 @@ final class PluginResourceTest {
                 .map(String::stripLeading)
                 .filter(line -> line.startsWith("-"))
                 .anyMatch(line -> line.contains("&a")));
+    }
+
+    @Test
+    void defaultLanguageFileContainsRuntimeMessageSections() throws IOException {
+        String languageYml = Files.readString(Path.of("src/main/resources/lang/zh_CN.yml"));
+
+        assertTrue(languageYml.contains("messages:"));
+        assertTrue(languageYml.contains("no-permission:"));
+        assertTrue(languageYml.contains("help:"));
+        assertTrue(languageYml.contains("status:"));
+        assertTrue(languageYml.contains("validation:"));
+        assertTrue(languageYml.contains("logs:"));
+        assertTrue(languageYml.contains("automatic-enabled:"));
+    }
+
+    @Test
+    void mainJavaSourcesDoNotKeepChineseRuntimeText() throws IOException {
+        try (Stream<Path> files = Files.walk(Path.of("src/main/java"))) {
+            boolean containsChinese =
+                files.filter(Files::isRegularFile)
+                    .filter(path -> path.toString().endsWith(".java"))
+                    .map(PluginResourceTest::readUnchecked)
+                    .anyMatch(content -> content.matches("(?s).*\\p{IsHan}.*"));
+
+            assertFalse(containsChinese);
+        }
+    }
+
+    private static String readUnchecked(Path path) {
+        try {
+            return Files.readString(path);
+        } catch (IOException exception) {
+            throw new IllegalStateException(exception);
+        }
     }
 }

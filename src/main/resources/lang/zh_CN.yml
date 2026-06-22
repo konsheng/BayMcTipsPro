@@ -1,0 +1,64 @@
+words:
+  enabled: "已启用"
+  disabled: "已禁用"
+  running: "运行中"
+  stopped: "未运行"
+
+scheduler:
+  folia: "Folia Global Scheduler"
+  bukkit: "Bukkit Scheduler"
+
+messages:
+  no-permission: "<red>你没有权限使用 BayMcTipsPro 命令。</red>"
+  unknown-command: "<red>未知命令。</red> <gray>使用 <yellow>/tips help</yellow> 查看帮助。</gray>"
+  help:
+    lines:
+      - "<gold>BayMcTipsPro 命令帮助</gold>"
+      - "<yellow>/tips</yellow> <gray>- 查看插件信息</gray>"
+      - "<yellow>/tips help</yellow> <gray>- 查看命令帮助</gray>"
+      - "<yellow>/tips info</yellow> <gray>- 查看插件信息</gray>"
+      - "<yellow>/tips next</yellow> <gray>- 立即发送一条随机公告</gray>"
+      - "<yellow>/tips status</yellow> <gray>- 查看公告运行状态</gray>"
+      - "<yellow>/tips reload</yellow> <gray>- 重载公告配置</gray>"
+  info:
+    lines:
+      - "<gold>BayMcTipsPro</gold> <gray>v%version%</gray>"
+      - "<gray>轻量级 MiniMessage 聊天栏公告插件</gray>"
+      - "<gray>使用 <yellow>/tips help</yellow> 查看命令帮助。</gray>"
+  next:
+    no-announcement: "<red>没有可用公告，无法发送。</red>"
+    success: "<green>已发送一条随机公告。</green> <gray>在线玩家: %online%</gray>"
+  status:
+    lines:
+      - "<gold>BayMcTipsPro 运行状态</gold>"
+      - "<gray>公告功能: %announcements%</gray>"
+      - "<gray>任务状态: %task%</gray>"
+      - "<gray>有效公告数量: %valid%</gray>"
+      - "<gray>无效公告数量: %invalid%</gray>"
+      - "<gray>公告间隔: %interval% 秒</gray>"
+      - "<gray>首次延迟: %initial_delay% 秒</gray>"
+      - "<gray>控制台同步: %console%</gray>"
+      - "<gray>调度模式: %scheduler%</gray>"
+  reload:
+    success: "<green>BayMcTipsPro 配置已重载。</green>"
+    summary: "<gray>有效公告: %valid%，无效公告: %invalid%，任务状态: %task%</gray>"
+
+validation:
+  blank-message: "公告内容为空"
+  parse-error: "MiniMessage 解析失败: %detail%"
+  minimum-raised: "%path% 配置值为 %value%，已提升到 %minimum%。"
+  messages-empty: "%path% 为空，自动公告不会启动。"
+
+logs:
+  enabled: "BayMcTipsPro 已启用，调度模式: %scheduler%。"
+  disabled: "BayMcTipsPro 已禁用。"
+  command-missing: "plugin.yml 缺少 baymctipspro 命令声明。"
+  invalid-announcement: "已跳过第 %index% 条公告: %reason%"
+  automatic-disabled: "自动公告已禁用。"
+  no-valid-announcements: "没有可用公告，定时任务未启动。"
+  automatic-enabled: "自动公告已启用: 有效 %valid% 条，无效 %invalid% 条，间隔 %interval% 秒，首次延迟 %initial_delay% 秒。"
+  announcement-sent: "[公告] %message%"
+
+errors:
+  scheduler-method-call: "调用调度器方法失败: %method%"
+  folia-task-method-call: "调用 Folia 任务方法失败: %method%"

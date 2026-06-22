@@ -1,7 +1,9 @@
 package com.baymc.tipspro.service;
 
 import com.baymc.tipspro.config.AnnouncementEntry;
+import com.baymc.tipspro.config.LanguageCatalog;
 import com.baymc.tipspro.config.PluginConfig;
+import static com.baymc.tipspro.config.LanguageCatalog.placeholder;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import org.bukkit.Bukkit;
@@ -17,6 +19,7 @@ import org.bukkit.plugin.Plugin;
 public final class AnnouncementService {
     private final Plugin plugin;
     private volatile PluginConfig config;
+    private volatile LanguageCatalog language;
 
     /**
      * Creates an announcement service for the given plugin.
@@ -28,12 +31,14 @@ public final class AnnouncementService {
     }
 
     /**
-     * Replaces the active runtime configuration.
+     * Replaces the active runtime configuration and language catalog.
      *
      * @param config validated configuration to use for later broadcasts
+     * @param language runtime text catalog for console output
      */
-    public void applyConfig(PluginConfig config) {
+    public void applyRuntime(PluginConfig config, LanguageCatalog language) {
         this.config = config;
+        this.language = language;
     }
 
     /**
@@ -61,7 +66,12 @@ public final class AnnouncementService {
         }
 
         if (snapshot.sendToConsole()) {
-            plugin.getLogger().info("[Announcement] " + announcement.plainText());
+            LanguageCatalog languageSnapshot = language;
+            plugin.getLogger()
+                .info(
+                    languageSnapshot.message(
+                        "logs.announcement-sent",
+                        placeholder("message", announcement.plainText())));
         }
 
         return AnnouncementBroadcastResult.sent(onlinePlayers, announcement);

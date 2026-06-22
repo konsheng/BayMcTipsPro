@@ -19,7 +19,7 @@ import org.bukkit.configuration.file.FileConfiguration;
  * @param sendToConsole whether sent announcements should be logged as plain text
  * @param validAnnouncements validated announcements ready for broadcast
  * @param invalidAnnouncements rejected announcement entries
- * @param warnings non-fatal normalization warnings gathered while loading
+ * @param notices non-fatal normalization notices gathered while loading
  */
 public record PluginConfig(
     boolean enabled,
@@ -28,7 +28,7 @@ public record PluginConfig(
     boolean sendToConsole,
     List<AnnouncementEntry> validAnnouncements,
     List<InvalidAnnouncement> invalidAnnouncements,
-    List<String> warnings) {
+    List<ConfigNotice> notices) {
 
     public static final int DEFAULT_INTERVAL_SECONDS = 300;
     public static final int DEFAULT_INITIAL_DELAY_SECONDS = 30;
@@ -44,7 +44,7 @@ public record PluginConfig(
     public PluginConfig {
         validAnnouncements = List.copyOf(validAnnouncements);
         invalidAnnouncements = List.copyOf(invalidAnnouncements);
-        warnings = List.copyOf(warnings);
+        notices = List.copyOf(notices);
     }
 
     /**
@@ -55,20 +55,20 @@ public record PluginConfig(
      * @return immutable validated runtime configuration
      */
     public static PluginConfig load(FileConfiguration configuration, MiniMessage miniMessage) {
-        List<String> warnings = new ArrayList<>();
+        List<ConfigNotice> notices = new ArrayList<>();
         boolean enabled = configuration.getBoolean("announcements.enabled", true);
         int intervalSeconds = normalizeSeconds(
             configuration.getInt("announcements.interval-seconds", DEFAULT_INTERVAL_SECONDS),
             MIN_INTERVAL_SECONDS,
             "announcements.interval-seconds",
-            warnings);
+            notices);
         int initialDelaySeconds = normalizeSeconds(
             configuration.getInt(
                 "announcements.initial-delay-seconds",
                 DEFAULT_INITIAL_DELAY_SECONDS),
             MIN_INITIAL_DELAY_SECONDS,
             "announcements.initial-delay-seconds",
-            warnings);
+            notices);
         boolean sendToConsole =
             configuration.getBoolean("announcements.send-to-console", true);
 
@@ -79,7 +79,8 @@ public record PluginConfig(
             int index = i + 1;
             String rawMessage = messages.get(i);
             if (rawMessage == null || rawMessage.isBlank()) {
-                invalidAnnouncements.add(new InvalidAnnouncement(index, "", "message is blank"));
+                invalidAnnouncements.add(
+                    new InvalidAnnouncement(index, "", "validation.blank-message", ""));
                 continue;
             }
             try {
@@ -92,12 +93,21 @@ public record PluginConfig(
                         PLAIN_TEXT.serialize(component)));
             } catch (RuntimeException exception) {
                 invalidAnnouncements.add(
-                    new InvalidAnnouncement(index, rawMessage, messageOf(exception)));
+                    new InvalidAnnouncement(
+                        index,
+                        rawMessage,
+                        "validation.parse-error",
+                        messageOf(exception)));
             }
         }
 
         if (messages.isEmpty()) {
-            warnings.add("announcements.messages is empty; automatic announcements will not run.");
+            notices.add(
+                new ConfigNotice(
+                    "validation.messages-empty",
+                    "announcements.messages",
+                    "",
+                    ""));
         }
 
         return new PluginConfig(
@@ -107,7 +117,7 @@ public record PluginConfig(
             sendToConsole,
             validAnnouncements,
             invalidAnnouncements,
-            warnings);
+            notices);
     }
 
     /**
@@ -141,11 +151,16 @@ public record PluginConfig(
         int value,
         int minimum,
         String path,
-        List<String> warnings) {
+        List<ConfigNotice> notices) {
         if (value >= minimum) {
             return value;
         }
-        warnings.add(path + " was " + value + "; raised to " + minimum + ".");
+        notices.add(
+            new ConfigNotice(
+                "validation.minimum-raised",
+                path,
+                String.valueOf(value),
+                String.valueOf(minimum)));
         return minimum;
     }
 

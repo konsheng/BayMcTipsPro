@@ -1,7 +1,10 @@
 package com.baymc.tipspro.scheduler;
 
+import com.baymc.tipspro.config.LanguageCatalog;
+import static com.baymc.tipspro.config.LanguageCatalog.placeholder;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.function.Supplier;
 import java.util.function.Consumer;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -16,15 +19,18 @@ import org.bukkit.scheduler.BukkitTask;
  */
 public final class SchedulerAdapter {
     private final Plugin plugin;
+    private final Supplier<LanguageCatalog> languageSupplier;
     private final boolean folia;
 
     /**
      * Creates a scheduler adapter and detects whether the server is Folia.
      *
      * @param plugin owning Bukkit plugin
+     * @param languageSupplier current language catalog supplier for runtime error text
      */
-    public SchedulerAdapter(Plugin plugin) {
+    public SchedulerAdapter(Plugin plugin, Supplier<LanguageCatalog> languageSupplier) {
         this.plugin = plugin;
+        this.languageSupplier = languageSupplier;
         this.folia = classExists("io.papermc.paper.threadedregions.RegionizedServer");
     }
 
@@ -35,15 +41,6 @@ public final class SchedulerAdapter {
      */
     public boolean isFolia() {
         return folia;
-    }
-
-    /**
-     * Returns a human-readable scheduler mode for status output.
-     *
-     * @return scheduler mode name
-     */
-    public String modeName() {
-        return folia ? "Folia Global Scheduler" : "Bukkit Scheduler";
     }
 
     /**
@@ -75,7 +72,7 @@ public final class SchedulerAdapter {
             (Consumer<Object>) ignored -> runnable.run(),
             safeDelay,
             safePeriod);
-        return new FoliaScheduledTaskHandle(task);
+        return new FoliaScheduledTaskHandle(task, languageSupplier);
     }
 
     private static boolean classExists(String className) {
@@ -87,7 +84,7 @@ public final class SchedulerAdapter {
         }
     }
 
-    private static Object invoke(
+    private Object invoke(
         Object target,
         String methodName,
         Class<?>[] parameterTypes,
@@ -98,12 +95,18 @@ public final class SchedulerAdapter {
             return method.invoke(target, args);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException exception) {
             throw new IllegalStateException(
-                "Unable to call scheduler method " + methodName,
+                languageSupplier.get()
+                    .message(
+                        "errors.scheduler-method-call",
+                        placeholder("method", methodName)),
                 exception);
         }
     }
 
-    private static Object invokeScheduledTask(Object task, String methodName) {
+    private static Object invokeScheduledTask(
+        Object task,
+        String methodName,
+        Supplier<LanguageCatalog> languageSupplier) {
         if (task == null) {
             return null;
         }
@@ -117,7 +120,10 @@ public final class SchedulerAdapter {
             | InvocationTargetException
             | NoSuchMethodException exception) {
             throw new IllegalStateException(
-                "Unable to call Folia scheduled task method " + methodName,
+                languageSupplier.get()
+                    .message(
+                        "errors.folia-task-method-call",
+                        placeholder("method", methodName)),
                 exception);
         }
     }
@@ -151,15 +157,17 @@ public final class SchedulerAdapter {
         }
     }
 
-    private record FoliaScheduledTaskHandle(Object task) implements ScheduledTaskHandle {
+    private record FoliaScheduledTaskHandle(
+        Object task,
+        Supplier<LanguageCatalog> languageSupplier) implements ScheduledTaskHandle {
         @Override
         public void cancel() {
-            invokeScheduledTask(task, "cancel");
+            invokeScheduledTask(task, "cancel", languageSupplier);
         }
 
         @Override
         public boolean isCancelled() {
-            Object cancelled = invokeScheduledTask(task, "isCancelled");
+            Object cancelled = invokeScheduledTask(task, "isCancelled", languageSupplier);
             return cancelled instanceof Boolean value && value;
         }
     }

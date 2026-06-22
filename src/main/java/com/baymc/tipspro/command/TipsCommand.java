@@ -1,8 +1,10 @@
 package com.baymc.tipspro.command;
 
 import com.baymc.tipspro.BayMcTipsProPlugin;
+import com.baymc.tipspro.config.LanguageCatalog;
 import com.baymc.tipspro.config.PluginConfig;
 import com.baymc.tipspro.service.AnnouncementBroadcastResult;
+import static com.baymc.tipspro.config.LanguageCatalog.placeholder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -48,7 +50,7 @@ public final class TipsCommand implements CommandExecutor, TabCompleter {
         @NotNull String label,
         @NotNull String[] args) {
         if (!hasCommandPermission(sender)) {
-            send(sender, "<red>你没有权限使用 BayMcTipsPro 命令。</red>");
+            send(sender, "messages.no-permission");
             return true;
         }
 
@@ -75,7 +77,7 @@ public final class TipsCommand implements CommandExecutor, TabCompleter {
                 yield true;
             }
             default -> {
-                send(sender, "<red>未知命令。</red> <gray>使用 <yellow>/tips help</yellow> 查看帮助。</gray>");
+                send(sender, "messages.unknown-command");
                 yield true;
             }
         };
@@ -101,75 +103,73 @@ public final class TipsCommand implements CommandExecutor, TabCompleter {
     }
 
     private void showHelp(CommandSender sender) {
-        send(sender, "<gold>BayMcTipsPro 命令帮助</gold>");
-        send(sender, "<yellow>/tips</yellow> <gray>- 查看插件信息</gray>");
-        send(sender, "<yellow>/tips help</yellow> <gray>- 查看命令帮助</gray>");
-        send(sender, "<yellow>/tips info</yellow> <gray>- 查看插件信息</gray>");
-        send(sender, "<yellow>/tips next</yellow> <gray>- 立即发送一条随机公告</gray>");
-        send(sender, "<yellow>/tips status</yellow> <gray>- 查看公告运行状态</gray>");
-        send(sender, "<yellow>/tips reload</yellow> <gray>- 重载公告配置</gray>");
+        sendLines(sender, "messages.help.lines");
     }
 
     private void showInfo(CommandSender sender) {
-        send(sender, "<gold>BayMcTipsPro</gold> <gray>v" + plugin.getPluginMeta().getVersion() + "</gray>");
-        send(sender, "<gray>轻量级 MiniMessage 聊天栏公告插件</gray>");
-        send(sender, "<gray>使用 <yellow>/tips help</yellow> 查看命令帮助。</gray>");
+        sendLines(
+            sender,
+            "messages.info.lines",
+            placeholder("version", plugin.getPluginMeta().getVersion()));
     }
 
     private void sendNext(CommandSender sender) {
         AnnouncementBroadcastResult result =
             plugin.announcementService().broadcastRandomAnnouncement();
         if (!result.sent()) {
-            send(sender, "<red>没有可用公告，无法发送。</red>");
+            send(sender, "messages.next.no-announcement");
             return;
         }
         send(
             sender,
-            "<green>已发送一条随机公告。</green> <gray>在线玩家: "
-                + result.onlinePlayers()
-                + "</gray>");
+            "messages.next.success",
+            placeholder("online", result.onlinePlayers()));
     }
 
     private void showStatus(CommandSender sender) {
         PluginConfig config = plugin.currentConfig();
-        send(sender, "<gold>BayMcTipsPro 运行状态</gold>");
-        send(sender, "<gray>公告功能: " + enabledText(config.enabled()) + "</gray>");
-        send(sender, "<gray>任务状态: " + runningText(plugin.announcementScheduler().isRunning()) + "</gray>");
-        send(sender, "<gray>有效公告数量: " + config.validAnnouncementCount() + "</gray>");
-        send(sender, "<gray>无效公告数量: " + config.invalidAnnouncementCount() + "</gray>");
-        send(sender, "<gray>公告间隔: " + config.intervalSeconds() + " 秒</gray>");
-        send(sender, "<gray>首次延迟: " + config.initialDelaySeconds() + " 秒</gray>");
-        send(sender, "<gray>控制台同步: " + enabledText(config.sendToConsole()) + "</gray>");
-        send(sender, "<gray>调度模式: " + plugin.schedulerAdapter().modeName() + "</gray>");
+        LanguageCatalog language = plugin.language();
+        sendLines(
+            sender,
+            "messages.status.lines",
+            placeholder("announcements", language.enabledText(config.enabled())),
+            placeholder("task", language.runningText(plugin.announcementScheduler().isRunning())),
+            placeholder("valid", config.validAnnouncementCount()),
+            placeholder("invalid", config.invalidAnnouncementCount()),
+            placeholder("interval", config.intervalSeconds()),
+            placeholder("initial_delay", config.initialDelaySeconds()),
+            placeholder("console", language.enabledText(config.sendToConsole())),
+            placeholder("scheduler", language.schedulerMode(plugin.schedulerAdapter().isFolia())));
     }
 
     private void reload(CommandSender sender) {
         PluginConfig config = plugin.reloadAnnouncements();
-        send(sender, "<green>BayMcTipsPro 配置已重载。</green>");
+        send(sender, "messages.reload.success");
         send(
             sender,
-            "<gray>有效公告: "
-                + config.validAnnouncementCount()
-                + "，无效公告: "
-                + config.invalidAnnouncementCount()
-                + "，任务状态: "
-                + runningText(plugin.announcementScheduler().isRunning())
-                + "</gray>");
+            "messages.reload.summary",
+            placeholder("valid", config.validAnnouncementCount()),
+            placeholder("invalid", config.invalidAnnouncementCount()),
+            placeholder("task", plugin.language().runningText(plugin.announcementScheduler().isRunning())));
     }
 
     private boolean hasCommandPermission(CommandSender sender) {
         return !(sender instanceof Player) || sender.hasPermission(PERMISSION);
     }
 
-    private void send(CommandSender sender, String message) {
-        sender.sendMessage(miniMessage.deserialize(message));
+    private void send(
+        CommandSender sender,
+        String path,
+        LanguageCatalog.Placeholder... placeholders) {
+        sender.sendMessage(miniMessage.deserialize(plugin.language().message(path, placeholders)));
     }
 
-    private static String enabledText(boolean enabled) {
-        return enabled ? "已启用" : "已禁用";
-    }
-
-    private static String runningText(boolean running) {
-        return running ? "运行中" : "未运行";
+    private void sendLines(
+        CommandSender sender,
+        String path,
+        LanguageCatalog.Placeholder... placeholders) {
+        for (String message : plugin.language().messages(path, placeholders)) {
+            sender.sendMessage(miniMessage.deserialize(message));
+        }
     }
 }
